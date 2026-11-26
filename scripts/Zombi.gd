@@ -62,20 +62,18 @@ func configurar_arquetipo() -> void:
 			salud_maxima = 75.0
 
 func _process(delta: float) -> void:
-	# Animación procedural de zombi: paso tambaleante y zancadas dinámicas
-	var se_mueve = velocity.length() > 0.2
-	if se_mueve:
-		tiempo_animacion += delta * (velocidad_base * 2.8)
-		# Bote vertical al pisar
-		visuales.position.y = abs(sin(tiempo_animacion * 2.0)) * 0.14
-		# Balanceo lateral de hombros (estilo infectado tambaleante)
-		visuales.rotation.z = sin(tiempo_animacion) * 0.16
-		# Inclinación agresiva hacia el frente al correr
-		visuales.rotation.x = 0.18
-	else:
-		visuales.position.y = move_toward(visuales.position.y, 0.0, 3.0 * delta)
-		visuales.rotation.z = move_toward(visuales.rotation.z, 0.0, 3.0 * delta)
-		visuales.rotation.x = move_toward(visuales.rotation.x, 0.0, 3.0 * delta)
+	# Si existe un AnimationPlayer interno en el modelo GLB, reproducir la animación de correr
+	if visuales.has_node("ModeloTripo/AnimationPlayer"):
+		var anim_player: AnimationPlayer = visuales.get_node("ModeloTripo/AnimationPlayer")
+		var se_mueve = velocity.length() > 0.2
+		if se_mueve:
+			if anim_player.has_animation("run") and anim_player.current_animation != "run":
+				anim_player.play("run")
+			elif anim_player.has_animation("walk") and anim_player.current_animation != "walk":
+				anim_player.play("walk")
+		else:
+			if anim_player.has_animation("idle") and anim_player.current_animation != "idle":
+				anim_player.play("idle")
 
 func _physics_process(delta: float) -> void:
 	# La lógica de IA y movimiento solo se procesa en el anfitrión (Server-Authoritative)

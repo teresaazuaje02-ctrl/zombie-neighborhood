@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpi4fjbift7vj"
-path.s3tc="res://.godot/imported/zombi_tripo_figuras_zombies_3d_rm.jpg-fec5ce85dda8818671755909d8a6353a.s3tc.ctex"
+uid="uid://bgbka0pji0yg7"
+path.s3tc="res://.godot/imported/zombi_tripo_68685d3e-be13-4468-a98f-cb7ebf0bc559_rm.jpg-c5b3da083cb08de65b11cd672f31a415.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "2a433e0526a564ae507056d082ec3d3e"
+"md5": "7c972ca949e03b96dd43cd96b3facfbc"
 }
 
 [deps]
 
-source_file="res://assets/personajes/zombi_tripo_figuras_zombies_3d_rm.jpg"
-dest_files=["res://.godot/imported/zombi_tripo_figuras_zombies_3d_rm.jpg-fec5ce85dda8818671755909d8a6353a.s3tc.ctex"]
+source_file="res://assets/personajes/zombi_tripo_68685d3e-be13-4468-a98f-cb7ebf0bc559_rm.jpg"
+dest_files=["res://.godot/imported/zombi_tripo_68685d3e-be13-4468-a98f-cb7ebf0bc559_rm.jpg-c5b3da083cb08de65b11cd672f31a415.s3tc.ctex"]
 
 [params]
 

@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 # Controlador de Personaje (FPS) para el Escuadrón de Supervivientes
 # Compatible con replicación multijugador nativa de Godot 4.
+# Incluye soporte para modelos 3D de armas, retroceso, sistema de compra en TiendaNPC y saqueo.
 
 @export var velocidad_base: float = 4.5
 @export var velocidad_sprint: float = 7.0
@@ -29,6 +30,7 @@ var tiempo_recarga_base: float = 1.4
 
 var suministros: int = 0
 var botiquines_auto_reanimar: int = 0
+var tienda_actual: Node = null
 
 # Timers de disparo
 var puede_disparar: bool = true
@@ -62,7 +64,6 @@ func _ready() -> void:
 	if is_multiplayer_authority():
 		camara.current = true
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		# Ocultar la malla del cuerpo propio para no bloquear la cámara en primera persona
 		if malla_propia:
 			malla_propia.visible = false
 		hud.visible = true
@@ -73,6 +74,7 @@ func _ready() -> void:
 		hud.actualizar_suministros(suministros)
 		hud.configurar_rol(_obtener_nombre_rol())
 		hud.mostrar_regla(1, "Cardio", "Mantén el ritmo al correr; los infectados no se cansan.")
+		hud.compra_solicitada.connect(_al_procesar_compra)
 	else:
 		camara.current = false
 		hud.visible = false
@@ -128,6 +130,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		socket_arma.position.y = posicion_original_arma.y + (event.relative.y * 0.0003)
 
 	if event.is_action_pressed("ui_cancel"):
+		if hud and hud.panel_tienda and hud.panel_tienda.visible:
+			hud.cerrar_tienda()
+			return
+
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		else:
@@ -144,7 +150,6 @@ func _physics_process(delta: float) -> void:
 	retroceso_actual = retroceso_actual.lerp(Vector3.ZERO, 15.0 * delta)
 
 	if esta_derribado:
-		# Opción de reanimarse en solitario pulsando Espacio durante pruebas
 		if Input.is_action_just_pressed("saltar"):
 			rpc("sincronizar_auto_reanimacion")
 		velocity.x = move_toward(velocity.x, 0.0, 5.0 * delta)
@@ -184,12 +189,17 @@ func _physics_process(delta: float) -> void:
 func actualizar_prompt_interaccion() -> void:
 	if raycast_disparo.is_colliding():
 		var col = raycast_disparo.get_collider()
-		if col and col.has_method("intentar_reparar") and col.tablones_actuales < 4:
-			hud.mostrar_prompt_interaccion("[E] Reparar Barricada", true)
-			return
-		elif col and col.has_method("saquear") and not col.ya_saqueado:
-			hud.mostrar_prompt_interaccion("[E] Saquear Contenedor", true)
-			return
+		if col:
+			if col.has_method("intentar_reparar") and col.tablones_actuales < 4:
+				hud.mostrar_prompt_interaccion("[E] Reparar Barricada", true)
+				return
+			elif col.has_method("saquear") and not col.ya_saqueado:
+				hud.mostrar_prompt_interaccion("[E] Saquear Contenedor", true)
+				return
+			elif col.has_method("interactuar"):
+				var txt = "[E] Comerciar en la Tienda" if col.get("esta_liberada") else "[E] Hablar con el Tendero"
+				hud.mostrar_prompt_interaccion(txt, true)
+				return
 	hud.mostrar_prompt_interaccion("", false)
 
 func ejecutar_disparo() -> void:
@@ -248,6 +258,8 @@ func ejecutar_interaccion() -> void:
 					hud.mostrar_regla(17, "No seas un héroe", "Mantener las barricadas en pie salva vidas.")
 			elif objeto.has_method("saquear"):
 				objeto.saquear(self)
+			elif objeto.has_method("interactuar"):
+				objeto.interactuar(self)
 
 func recibir_botin(botin: Dictionary) -> void:
 	suministros += botin.get("suministros", 0)
@@ -256,15 +268,56 @@ func recibir_botin(botin: Dictionary) -> void:
 	if botin.get("botiquin", false):
 		botiquines_auto_reanimar += 1
 
+	actualizar_hud_suministros()
+	
+	var texto_botin = "+$%d Suministros | +%d Balas" % [botin.get("suministros", 0), botin.get("municion", 0)]
+	if botin.get("botiquin", false):
+		texto_botin += " | ¡Botiquín encontrado!"
+
+	hud.mostrar_regla(32, "Disfruta las pequeñas cosas", texto_botin)
+
+func actualizar_hud_suministros() -> void:
 	if is_multiplayer_authority():
 		hud.actualizar_suministros(suministros)
 		hud.actualizar_municion(cargador_actual, municion_reserva)
-		
-		var texto_botin = "+$%d Suministros | +%d Balas" % [botin.get("suministros", 0), botin.get("municion", 0)]
-		if botin.get("botiquin", false):
-			texto_botin += " | ¡Botiquín encontrado!"
 
-		hud.mostrar_regla(32, "Disfruta las pequeñas cosas", texto_botin)
+# Sistema de Comercio
+func abrir_tienda(tienda_ref: Node) -> void:
+	tienda_actual = tienda_ref
+	if is_multiplayer_authority():
+		hud.abrir_tienda(tienda_ref, suministros)
+
+func _al_procesar_compra(articulo: String) -> void:
+	if not tienda_actual:
+		return
+
+	var exito: bool = false
+	match articulo:
+		"escopeta":
+			exito = tienda_actual.intentar_comprar_escopeta(self)
+		"rifle":
+			exito = tienda_actual.intentar_comprar_rifle(self)
+		"botiquin":
+			exito = tienda_actual.intentar_comprar_botiquin(self)
+		"municion":
+			exito = tienda_actual.intentar_comprar_municion(self)
+
+	if exito:
+		actualizar_hud_suministros()
+		hud.mostrar_regla(2, "Doble Tiro", "¡Nueva arma / suministro adquirido en la tienda!")
+
+func equipar_arma_comprada(nombre: String, danio: float, cargador: int, reserva: int) -> void:
+	danio_arma_inicial = danio
+	cargador_maximo = cargador
+	cargador_actual = cargador
+	municion_reserva += reserva
+	rol = 1 # Pasa a empuñar arma de fuego
+	actualizar_modelo_arma_visible()
+	
+	if is_multiplayer_authority():
+		hud.actualizar_arma_nombre(nombre)
+		hud.actualizar_municion(cargador_actual, municion_reserva)
+		hud.actualizar_suministros(suministros)
 
 @rpc("any_peer", "call_local")
 func servidor_aplicar_danio_a_enemigo(ruta_enemigo: NodePath, cantidad: float) -> void:

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c6r2p5kx7m21q"]
+[gd_scene load_steps=6 format=3 uid="uid://c6r2p5kx7m21q"]
 
 [ext_resource type="Script" path="res://scripts/HUD.gd" id="1_hud"]
 
@@ -27,6 +27,18 @@ corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda"]
+bg_color = Color(0.12, 0.14, 0.18, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3, 0.55, 0.85, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -212,7 +224,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
 theme_override_font_sizes/font_size = 18
 text = "¡ESTÁS DERRIBADO!
-Espera auxilio de un compañero"
+Pulsa [ESPACIO] o espera auxilio médico"
 horizontal_alignment = 1
 
 [node name="SuperiorCentro" type="Control" parent="."]
@@ -254,3 +266,99 @@ horizontal_alignment = 1
 
 [node name="TimerRegla" type="Timer" parent="SuperiorCentro/BannerRegla"]
 one_shot = true
+
+[node name="MenuTienda" type="PanelContainer" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -180.0
+offset_right = 240.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tienda")
+
+[node name="VBox" type="VBoxContainer" parent="MenuTienda"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Titulo" type="Label" parent="MenuTienda/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "★ TIENDA DEL BARRIO (EL TENDERO) ★"
+horizontal_alignment = 1
+
+[node name="FondosLabel" type="Label" parent="MenuTienda/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "TUS SUMINISTROS DISPONIBLES: $ 0"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MenuTienda/VBox"]
+layout_mode = 2
+
+[node name="ItemEscopeta" type="HBoxContainer" parent="MenuTienda/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MenuTienda/VBox/ItemEscopeta"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Escopeta Corredera ($600) - Daño 90"
+
+[node name="BtnComprarEscopeta" type="Button" parent="MenuTienda/VBox/ItemEscopeta"]
+layout_mode = 2
+text = "Comprar"
+
+[node name="ItemRifle" type="HBoxContainer" parent="MenuTienda/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MenuTienda/VBox/ItemRifle"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Rifle de Asalto ($900) - Daño 42"
+
+[node name="BtnComprarRifle" type="Button" parent="MenuTienda/VBox/ItemRifle"]
+layout_mode = 2
+text = "Comprar"
+
+[node name="ItemBotiquin" type="HBoxContainer" parent="MenuTienda/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MenuTienda/VBox/ItemBotiquin"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Botiquín Auto-Reanimación ($400)"
+
+[node name="BtnComprarBotiquin" type="Button" parent="MenuTienda/VBox/ItemBotiquin"]
+layout_mode = 2
+text = "Comprar"
+
+[node name="ItemMunicion" type="HBoxContainer" parent="MenuTienda/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MenuTienda/VBox/ItemMunicion"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Recarga de Munición ($150) - +60 Balas"
+
+[node name="BtnComprarMunicion" type="Button" parent="MenuTienda/VBox/ItemMunicion"]
+layout_mode = 2
+text = "Comprar"
+
+[node name="HSeparator2" type="HSeparator" parent="MenuTienda/VBox"]
+layout_mode = 2
+
+[node name="CerrarBtn" type="Button" parent="MenuTienda/VBox"]
+layout_mode = 2
+text = "Cerrar Tienda"
+
+[connection signal="pressed" from="MenuTienda/VBox/ItemEscopeta/BtnComprarEscopeta" to="." method="_on_comprar_escopeta_pressed"]
+[connection signal="pressed" from="MenuTienda/VBox/ItemRifle/BtnComprarRifle" to="." method="_on_comprar_rifle_pressed"]
+[connection signal="pressed" from="MenuTienda/VBox/ItemBotiquin/BtnComprarBotiquin" to="." method="_on_comprar_botiquin_pressed"]
+[connection signal="pressed" from="MenuTienda/VBox/ItemMunicion/BtnComprarMunicion" to="." method="_on_comprar_municion_pressed"]
+[connection signal="pressed" from="MenuTienda/VBox/CerrarBtn" to="." method="_on_cerrar_tienda_pressed"]

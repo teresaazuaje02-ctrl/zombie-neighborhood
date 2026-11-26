@@ -50,25 +50,37 @@ func _buscar_animation_player(nodo: Node) -> void:
 		print("Animaciones detectadas en el Zombi: ", lista_animaciones)
 		
 		if lista_animaciones.size() > 0:
-			anim_carrera = lista_animaciones[0]
+			# Priorizar la animación más agresiva/modificada
+			anim_carrera = lista_animaciones[-1]
 			for nombre in lista_animaciones:
 				var n_min = nombre.to_lower()
-				if "agresivo" in n_min or "ataque" in n_min or "corra" in n_min:
+				# Dar prioridad absoluta a la animación de ataque agresivo donde mueve brazos y cuerpo
+				if "super agresivo" in n_min or "ataque" in n_min:
 					anim_carrera = nombre
 					break
+				elif "agresivo" in n_min or "corra" in n_min:
+					anim_carrera = nombre
 
-			# Configurar modo bucle (loop) en todas las animaciones detectadas
+			# Conectar señal de fin de animación para bucle ininterrumpido garantizado
+			if not anim_player.animation_finished.is_connected(_al_terminar_animacion):
+				anim_player.animation_finished.connect(_al_terminar_animacion)
+
+			# Configurar modo bucle (loop) en todas las animaciones
 			for nombre in lista_animaciones:
 				var a = anim_player.get_animation(nombre)
 				if a:
 					a.loop_mode = Animation.LOOP_LINEAR
 
 			anim_player.play(anim_carrera)
-			print("Reproduciendo animacion de ataque agresivo: ", anim_carrera)
+			print("Reproduciendo animacion agresiva continua: ", anim_carrera)
 		return
 
 	for hijo in nodo.get_children():
 		_buscar_animation_player(hijo)
+
+func _al_terminar_animacion(_nombre_anim: StringName) -> void:
+	if anim_player and anim_carrera != "":
+		anim_player.play(anim_carrera)
 
 func configurar_arquetipo() -> void:
 	match tipo:
@@ -93,14 +105,10 @@ func configurar_arquetipo() -> void:
 			salud_maxima = 75.0
 
 func _process(_delta: float) -> void:
+	# Asegurar que el zombi NUNCA permanezca congelado o en pose T
 	if anim_player and anim_carrera != "":
-		var se_mueve = velocity.length() > 0.2
-		if se_mueve:
-			if not anim_player.is_playing() or anim_player.current_animation != anim_carrera:
-				anim_player.play(anim_carrera)
-		else:
-			# Si está quieto y no tiene animación de idle, pausar o reproducir primera
-			pass
+		if not anim_player.is_playing():
+			anim_player.play(anim_carrera)
 
 func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server():
@@ -193,4 +201,10 @@ func recibir_danio(cantidad: float) -> void:
 		morir()
 
 func morir() -> void:
+	# Notificar a la tienda del tendero si fue eliminado en su perímetro de defensa
+	var tiendas = get_tree().get_nodes_in_group("tienda_npc")
+	for t in tiendas:
+		if is_instance_valid(t) and global_position.distance_to(t.global_position) <= 15.0:
+			if t.has_method("registrar_baja_zombi"):
+				t.registrar_baja_zombi()
 	queue_free()

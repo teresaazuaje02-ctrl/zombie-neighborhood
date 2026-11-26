@@ -2,14 +2,18 @@ extends Node3D
 
 @onready var contenedor_jugadores: Node3D = $ContenedorJugadores
 @onready var spawner_jugadores: MultiplayerSpawner = $MultiplayerSpawner
+@onready var contenedor_zombis: Node3D = $ContenedorZombis
+@onready var spawner_zombis: MultiplayerSpawner = $MultiplayerSpawnerZombis
 @onready var menu_lobby: CanvasLayer = $MenuLobby
 @onready var ip_input: LineEdit = $MenuLobby/Panel/VBoxContainer/HBoxContainer/IPInput
 @onready var rol_selector: OptionButton = $MenuLobby/Panel/VBoxContainer/RolSelector
+@onready var timer_oleadas: Timer = $TimerOleadas
 
 const ESCENA_JUGADOR = preload("res://escenas/jugadores/Jugador.tscn")
+const ESCENA_ZOMBI = preload("res://escenas/enemigos/Zombi.tscn")
 
 func _ready() -> void:
-	# Configurar opciones de roles
+	# Configurar selector de roles
 	rol_selector.clear()
 	rol_selector.add_item("Médico (Soporte)", RedManager.Rol.MEDICO)
 	rol_selector.add_item("Militar (Armas de fuego)", RedManager.Rol.MILITAR)
@@ -20,12 +24,16 @@ func _ready() -> void:
 	RedManager.jugador_conectado.connect(_al_jugador_conectado)
 	RedManager.jugador_desconectado.connect(_al_jugador_desconectado)
 
+	timer_oleadas.timeout.connect(_generar_oleada_prueba)
+
 func _on_host_pressed() -> void:
 	RedManager.mi_info["rol"] = rol_selector.get_selected_id()
 	var error = RedManager.crear_partida()
 	if error == OK:
 		menu_lobby.visible = false
 		_instanciar_jugador(1)
+		# Iniciar temporizador de zombis en el servidor
+		timer_oleadas.start(3.0)
 
 func _on_unirse_pressed() -> void:
 	RedManager.mi_info["rol"] = rol_selector.get_selected_id()
@@ -37,7 +45,6 @@ func _on_unirse_pressed() -> void:
 		menu_lobby.visible = false
 
 func _al_jugador_conectado(peer_id: int, info: Dictionary) -> void:
-	# El anfitrión se encarga de instanciar a los nuevos participantes
 	if multiplayer.is_server() and peer_id != 1:
 		_instanciar_jugador(peer_id)
 
@@ -54,3 +61,16 @@ func _al_jugador_desconectado(peer_id: int) -> void:
 		var nodo = contenedor_jugadores.get_node_or_null(str(peer_id))
 		if nodo:
 			nodo.queue_free()
+
+func _generar_oleada_prueba() -> void:
+	if not multiplayer.is_server():
+		return
+
+	# Generar zombis de prueba si hay menos de 5 activos
+	if contenedor_zombis.get_child_count() < 5:
+		var zombi = ESCENA_ZOMBI.instantiate()
+		zombi.name = "Zombi_" + str(randi() % 10000)
+		var angulo = randf() * TAU
+		var distancia = randf_range(12.0, 18.0)
+		zombi.position = Vector3(cos(angulo) * distancia, 0.5, sin(angulo) * distancia)
+		contenedor_zombis.add_child(zombi, true)

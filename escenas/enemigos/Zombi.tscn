@@ -1,0 +1,66 @@
+[gd_scene load_steps=7 format=3 uid="uid://c51nxm4r7yq2w"]
+
+[ext_resource type="Script" path="res://scripts/Zombi.gd" id="1_zombi"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zombi"]
+albedo_color = Color(0.28, 0.45, 0.22, 1)
+roughness = 0.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+material = SubResource("StandardMaterial3D_zombi")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_ojos"]
+size = Vector3(0.3, 0.1, 0.2)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_zombi"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:salud_actual")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:tipo")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+
+[node name="Zombi" type="CharacterBody3D" groups=["enemigos"]]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_zombi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="MallaPlaceholder" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_1")
+
+[node name="MallaOjos" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.35)
+mesh = SubResource("BoxMesh_ojos")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+target_desired_distance = 1.2
+path_height_offset = 0.1
+avoidance_enabled = true
+
+[node name="RayCastBarricada" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+target_position = Vector3(0, 0, -1.8)
+collision_mask = 4
+
+[node name="TimerAtaque" type="Timer" parent="."]
+one_shot = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_zombi")

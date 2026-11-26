@@ -53,16 +53,18 @@ func _buscar_animation_player(nodo: Node) -> void:
 			anim_carrera = lista_animaciones[0]
 			for nombre in lista_animaciones:
 				var n_min = nombre.to_lower()
-				if "run" in n_min or "walk" in n_min or "correr" in n_min or "caminar" in n_min:
+				if "agresivo" in n_min or "ataque" in n_min or "corra" in n_min:
 					anim_carrera = nombre
 					break
 
-			# Configurar modo bucle (loop) para que corra continuamente
-			var anim = anim_player.get_animation(anim_carrera)
-			if anim:
-				anim.loop_mode = Animation.LOOP_LINEAR
+			# Configurar modo bucle (loop) en todas las animaciones detectadas
+			for nombre in lista_animaciones:
+				var a = anim_player.get_animation(nombre)
+				if a:
+					a.loop_mode = Animation.LOOP_LINEAR
 
 			anim_player.play(anim_carrera)
+			print("Reproduciendo animacion de ataque agresivo: ", anim_carrera)
 		return
 
 	for hijo in nodo.get_children():

@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://df2m4xk3p7e1l"]
+[gd_scene load_steps=11 format=3 uid="uid://df2m4xk3p7e1l"]
 
 [ext_resource type="Script" path="res://scripts/Jugador.gd" id="1_jugador"]
 [ext_resource type="PackedScene" uid="uid://c6r2p5kx7m21q" path="res://escenas/jugadores/HUD.tscn" id="2_hud"]
+[ext_resource type="PackedScene" path="res://assets/armas/pistola_tripo.glb" id="3_pistola_tripo"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
@@ -10,19 +11,6 @@ height = 1.8
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
 radius = 0.4
 height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pistola"]
-albedo_color = Color(0.18, 0.19, 0.22, 1)
-metallic = 0.8
-roughness = 0.3
-
-[sub_resource type="BoxMesh" id="BoxMesh_canon"]
-material = SubResource("StandardMaterial3D_pistola")
-size = Vector3(0.06, 0.08, 0.28)
-
-[sub_resource type="BoxMesh" id="BoxMesh_empunadura"]
-material = SubResource("StandardMaterial3D_pistola")
-size = Vector3(0.05, 0.16, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_madera"]
 albedo_color = Color(0.55, 0.38, 0.2, 1)
@@ -78,13 +66,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, -0.22, -0.42)
 
 [node name="Pistola9mm" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 
-[node name="Canon" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/Pistola9mm"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.08)
-mesh = SubResource("BoxMesh_canon")
-
-[node name="Empunadura" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/Pistola9mm"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, -0.06, 0.02)
-mesh = SubResource("BoxMesh_empunadura")
+[node name="ModeloTripo" parent="Cabeza/Camera3D/SocketArma/Pistola9mm" instance=ExtResource("3_pistola_tripo")]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 
 [node name="BateClavos" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(0.866025, 0.5, 0, -0.353553, 0.612372, -0.707107, -0.353553, 0.612372, 0.707107, 0, 0.1, -0.1)

@@ -1,29 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://c51nxm4r7yq2w"]
+[gd_scene load_steps=5 format=3 uid="uid://c51nxm4r7yq2w"]
 
 [ext_resource type="Script" path="res://scripts/Zombi.gd" id="1_zombi"]
+[ext_resource type="PackedScene" path="res://assets/personajes/zombi_tripo.glb" id="2_zombi_tripo"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
 height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zombi"]
-albedo_color = Color(0.28, 0.45, 0.22, 1)
-roughness = 0.8
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
-material = SubResource("StandardMaterial3D_zombi")
-radius = 0.4
-height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ojos"]
-albedo_color = Color(0.9, 0.1, 0.1, 1)
-emission_enabled = true
-emission = Color(0.9, 0.1, 0.1, 1)
-emission_energy_multiplier = 2.0
-
-[sub_resource type="BoxMesh" id="BoxMesh_ojos"]
-material = SubResource("StandardMaterial3D_ojos")
-size = Vector3(0.25, 0.08, 0.15)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_zombi"]
 properties/0/path = NodePath(".:position")
@@ -50,13 +32,8 @@ shape = SubResource("CapsuleShape3D_1")
 
 [node name="VisualesZombi" type="Node3D" parent="."]
 
-[node name="MallaPlaceholder" type="MeshInstance3D" parent="VisualesZombi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("CapsuleMesh_1")
-
-[node name="MallaOjos" type="MeshInstance3D" parent="VisualesZombi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.35)
-mesh = SubResource("BoxMesh_ojos")
+[node name="ModeloTripo" parent="VisualesZombi" instance=ExtResource("2_zombi_tripo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 target_desired_distance = 1.2

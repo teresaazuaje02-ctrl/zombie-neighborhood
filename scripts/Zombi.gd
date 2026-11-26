@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 # Controlador de Inteligencia Artificial para Zombis
 # Maneja navegación con NavigationAgent3D, ataque a jugadores, daño a barricadas
-# y animación procedural fluida de carrera y tambaleo infectado.
+# y reproducción automática de animaciones esqueléticas (.glb de Tripo/Mixamo).
 
 enum TipoZombi {
 	COMUN,
@@ -24,7 +24,8 @@ var objetivo_actual: Node3D = null
 var puede_atacar: bool = true
 var gravedad: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
-var tiempo_animacion: float = randf() * 10.0
+var anim_player: AnimationPlayer = null
+var anim_carrera: String = ""
 
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 @onready var timer_ataque: Timer = $TimerAtaque
@@ -38,6 +39,34 @@ func _ready() -> void:
 	
 	timer_ataque.wait_time = cadencia_ataque
 	timer_ataque.timeout.connect(_al_timeout_ataque)
+
+	# Buscar y activar automáticamente el AnimationPlayer del modelo importado
+	_buscar_animation_player(visuales)
+
+func _buscar_animation_player(nodo: Node) -> void:
+	if nodo is AnimationPlayer:
+		anim_player = nodo
+		var lista_animaciones = anim_player.get_animation_list()
+		print("Animaciones detectadas en el Zombi: ", lista_animaciones)
+		
+		if lista_animaciones.size() > 0:
+			anim_carrera = lista_animaciones[0]
+			for nombre in lista_animaciones:
+				var n_min = nombre.to_lower()
+				if "run" in n_min or "walk" in n_min or "correr" in n_min or "caminar" in n_min:
+					anim_carrera = nombre
+					break
+
+			# Configurar modo bucle (loop) para que corra continuamente
+			var anim = anim_player.get_animation(anim_carrera)
+			if anim:
+				anim.loop_mode = Animation.LOOP_LINEAR
+
+			anim_player.play(anim_carrera)
+		return
+
+	for hijo in nodo.get_children():
+		_buscar_animation_player(hijo)
 
 func configurar_arquetipo() -> void:
 	match tipo:
@@ -61,22 +90,17 @@ func configurar_arquetipo() -> void:
 			velocidad_base = 3.5
 			salud_maxima = 75.0
 
-func _process(delta: float) -> void:
-	# Si existe un AnimationPlayer interno en el modelo GLB, reproducir la animación de correr
-	if visuales.has_node("ModeloTripo/AnimationPlayer"):
-		var anim_player: AnimationPlayer = visuales.get_node("ModeloTripo/AnimationPlayer")
+func _process(_delta: float) -> void:
+	if anim_player and anim_carrera != "":
 		var se_mueve = velocity.length() > 0.2
 		if se_mueve:
-			if anim_player.has_animation("run") and anim_player.current_animation != "run":
-				anim_player.play("run")
-			elif anim_player.has_animation("walk") and anim_player.current_animation != "walk":
-				anim_player.play("walk")
+			if not anim_player.is_playing() or anim_player.current_animation != anim_carrera:
+				anim_player.play(anim_carrera)
 		else:
-			if anim_player.has_animation("idle") and anim_player.current_animation != "idle":
-				anim_player.play("idle")
+			# Si está quieto y no tiene animación de idle, pausar o reproducir primera
+			pass
 
 func _physics_process(delta: float) -> void:
-	# La lógica de IA y movimiento solo se procesa en el anfitrión (Server-Authoritative)
 	if not multiplayer.is_server():
 		return
 

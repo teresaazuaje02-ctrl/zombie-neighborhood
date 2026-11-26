@@ -33,7 +33,7 @@ shape = SubResource("CapsuleShape3D_1")
 [node name="VisualesZombi" type="Node3D" parent="."]
 
 [node name="ModeloTripo" parent="VisualesZombi" instance=ExtResource("2_zombi_tripo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 target_desired_distance = 1.2

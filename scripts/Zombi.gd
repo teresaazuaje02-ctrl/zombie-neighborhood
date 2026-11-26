@@ -1,7 +1,8 @@
 extends CharacterBody3D
 
 # Controlador de Inteligencia Artificial para Zombis
-# Maneja navegación con NavigationAgent3D, ataque a jugadores y daño a barricadas.
+# Maneja navegación con NavigationAgent3D, ataque a jugadores, daño a barricadas
+# y animación procedural fluida de carrera y tambaleo infectado.
 
 enum TipoZombi {
 	COMUN,
@@ -23,10 +24,13 @@ var objetivo_actual: Node3D = null
 var puede_atacar: bool = true
 var gravedad: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+var tiempo_animacion: float = randf() * 10.0
+
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 @onready var timer_ataque: Timer = $TimerAtaque
 @onready var sincronizador: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @onready var detector_barricada: RayCast3D = $RayCastBarricada
+@onready var visuales: Node3D = $VisualesZombi
 
 func _ready() -> void:
 	salud_actual = salud_maxima
@@ -34,10 +38,6 @@ func _ready() -> void:
 	
 	timer_ataque.wait_time = cadencia_ataque
 	timer_ataque.timeout.connect(_al_timeout_ataque)
-
-	# La IA solo se procesa en el anfitrión (Server-Authoritative)
-	if not multiplayer.is_server():
-		set_physics_process(false)
 
 func configurar_arquetipo() -> void:
 	match tipo:
@@ -61,14 +61,30 @@ func configurar_arquetipo() -> void:
 			velocidad_base = 3.5
 			salud_maxima = 75.0
 
+func _process(delta: float) -> void:
+	# Animación procedural de zombi: paso tambaleante y zancadas dinámicas
+	var se_mueve = velocity.length() > 0.2
+	if se_mueve:
+		tiempo_animacion += delta * (velocidad_base * 2.8)
+		# Bote vertical al pisar
+		visuales.position.y = abs(sin(tiempo_animacion * 2.0)) * 0.14
+		# Balanceo lateral de hombros (estilo infectado tambaleante)
+		visuales.rotation.z = sin(tiempo_animacion) * 0.16
+		# Inclinación agresiva hacia el frente al correr
+		visuales.rotation.x = 0.18
+	else:
+		visuales.position.y = move_toward(visuales.position.y, 0.0, 3.0 * delta)
+		visuales.rotation.z = move_toward(visuales.rotation.z, 0.0, 3.0 * delta)
+		visuales.rotation.x = move_toward(visuales.rotation.x, 0.0, 3.0 * delta)
+
 func _physics_process(delta: float) -> void:
+	# La lógica de IA y movimiento solo se procesa en el anfitrión (Server-Authoritative)
 	if not multiplayer.is_server():
 		return
 
 	if not is_on_floor():
 		velocity.y -= gravedad * delta
 
-	# Buscar o validar el objetivo (jugador vivo más cercano)
 	buscar_jugador_cercano()
 
 	if objetivo_actual and is_instance_valid(objetivo_actual):
@@ -116,7 +132,6 @@ func buscar_jugador_cercano() -> void:
 
 	for j in jugadores:
 		if is_instance_valid(j):
-			# Preferir jugadores no derribados si están disponibles
 			var esta_derribado = j.get("esta_derribado")
 			var dist = global_position.distance_to(j.global_position)
 			if esta_derribado != null and not esta_derribado:
@@ -154,5 +169,4 @@ func recibir_danio(cantidad: float) -> void:
 		morir()
 
 func morir() -> void:
-	# El servidor libera el nodo y MultiplayerSpawner replica la eliminación en clientes
 	queue_free()

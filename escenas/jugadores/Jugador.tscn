@@ -62,12 +62,12 @@ target_position = Vector3(0, 0, -40)
 collision_mask = 5
 
 [node name="SocketArma" type="Node3D" parent="Cabeza/Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, -0.22, -0.42)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.18, -0.38)
 
 [node name="Pistola9mm" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 
 [node name="ModeloTripo" parent="Cabeza/Camera3D/SocketArma/Pistola9mm" instance=ExtResource("3_pistola_tripo")]
-transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+transform = Transform3D(0, 0, -0.18, 0, 0.18, 0, 0.18, 0, 0, 0, 0, 0)
 
 [node name="BateClavos" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(0.866025, 0.5, 0, -0.353553, 0.612372, -0.707107, -0.353553, 0.612372, 0.707107, 0, 0.1, -0.1)

@@ -48,7 +48,7 @@ var cadencia_disparo: float = 0.25
 @onready var malla_bate: Node3D = $Cabeza/Camera3D/SocketArma/BateClavos
 @onready var fogonazo: OmniLight3D = $Cabeza/Camera3D/SocketArma/Fogonazo
 
-var posicion_original_arma: Vector3 = Vector3(0.24, -0.22, -0.42)
+var posicion_original_arma: Vector3 = Vector3(0.22, -0.18, -0.38)
 var retroceso_actual: Vector3 = Vector3.ZERO
 var gravedad: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 

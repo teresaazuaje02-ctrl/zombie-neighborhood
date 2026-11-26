@@ -2,7 +2,6 @@ extends CharacterBody3D
 
 # Controlador de Personaje (FPS) para el Escuadrón de Supervivientes
 # Compatible con replicación multijugador nativa de Godot 4.
-# Incluye soporte para modelos 3D de armas (.glb de Tripo3D), retroceso y balanceo (sway).
 
 @export var velocidad_base: float = 4.5
 @export var velocidad_sprint: float = 7.0
@@ -41,6 +40,7 @@ var cadencia_disparo: float = 0.25
 @onready var raycast_disparo: RayCast3D = $Cabeza/RayCastDisparo
 @onready var sincronizador: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @onready var hud: CanvasLayer = $HUD
+@onready var malla_propia: MeshInstance3D = $MallaPlaceholder
 
 # Socket de Armas en Primera Persona
 @onready var socket_arma: Node3D = $Cabeza/Camera3D/SocketArma
@@ -62,6 +62,9 @@ func _ready() -> void:
 	if is_multiplayer_authority():
 		camara.current = true
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		# Ocultar la malla del cuerpo propio para no bloquear la cámara en primera persona
+		if malla_propia:
+			malla_propia.visible = false
 		hud.visible = true
 		socket_arma.visible = true
 		actualizar_modelo_arma_visible()
@@ -73,14 +76,15 @@ func _ready() -> void:
 	else:
 		camara.current = false
 		hud.visible = false
-		# Ocultar arma en primera persona para otros clientes
 		socket_arma.visible = false
+		if malla_propia:
+			malla_propia.visible = true
 
 func actualizar_modelo_arma_visible() -> void:
-	if rol == 1: # Militar inicia con arma de fuego (Pistola)
+	if rol == 1:
 		malla_pistola.visible = true
 		malla_bate.visible = false
-	else: # Médico, Carpintero y Explorador inician con Bate
+	else:
 		malla_pistola.visible = false
 		malla_bate.visible = true
 
@@ -94,20 +98,20 @@ func _obtener_nombre_rol() -> String:
 
 func aplicar_bonificaciones_rol() -> void:
 	match rol:
-		0: # MEDICO
+		0:
 			multiplicador_reparacion = 1.0
 			danio_arma_inicial = 35.0
 			cargador_maximo = 15
 			botiquines_auto_reanimar = 1
-		1: # MILITAR (+35% cargador, -40% tiempo recarga)
+		1:
 			multiplicador_recarga = 0.6
 			danio_arma_inicial = 28.0
 			cargador_maximo = int(15 * 1.35)
 			cargador_actual = cargador_maximo
-		2: # CARPINTERO (Doble velocidad / doble tablón)
+		2:
 			multiplicador_reparacion = 2.0
 			danio_arma_inicial = 35.0
-		3: # EXPLORADOR (+15% velocidad, +35% botín)
+		3:
 			multiplicador_velocidad = 1.15
 			danio_arma_inicial = 35.0
 
@@ -120,7 +124,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		cabeza.rotate_x(-event.relative.y * sensibilidad_raton)
 		cabeza.rotation.x = clamp(cabeza.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
 		
-		# Balanceo de arma por rotación de cámara (Weapon Sway)
 		socket_arma.position.x = posicion_original_arma.x - (event.relative.x * 0.0003)
 		socket_arma.position.y = posicion_original_arma.y + (event.relative.y * 0.0003)
 
@@ -137,11 +140,13 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravedad * delta
 
-	# Suavizar recuperación del retroceso y posición del arma
 	socket_arma.position = socket_arma.position.lerp(posicion_original_arma + retroceso_actual, 12.0 * delta)
 	retroceso_actual = retroceso_actual.lerp(Vector3.ZERO, 15.0 * delta)
 
 	if esta_derribado:
+		# Opción de reanimarse en solitario pulsando Espacio durante pruebas
+		if Input.is_action_just_pressed("saltar"):
+			rpc("sincronizar_auto_reanimacion")
 		velocity.x = move_toward(velocity.x, 0.0, 5.0 * delta)
 		velocity.z = move_toward(velocity.z, 0.0, 5.0 * delta)
 		move_and_slide()
@@ -194,13 +199,12 @@ func ejecutar_disparo() -> void:
 
 	puede_disparar = false
 
-	if rol == 1: # Militar dispara con munición
+	if rol == 1:
 		cargador_actual -= 1
 		hud.actualizar_municion(cargador_actual, municion_reserva)
-		# Retroceso de arma de fuego hacia atrás y hacia arriba
 		retroceso_actual = Vector3(0.0, 0.03, 0.08)
 		activar_fogonazo()
-	else: # Ataque cuerpo a cuerpo (Bate con clavos)
+	else:
 		retroceso_actual = Vector3(-0.06, -0.04, 0.1)
 
 	if raycast_disparo.is_colliding():
@@ -222,7 +226,6 @@ func ejecutar_recarga() -> void:
 
 	recargando = true
 	var tiempo = tiempo_recarga_base * multiplicador_recarga
-	# Animación simple de bajada de arma durante la recarga
 	retroceso_actual = Vector3(0.0, -0.2, 0.05)
 	await get_tree().create_timer(tiempo).timeout
 
@@ -300,3 +303,11 @@ func sincronizar_derribo(derribado: bool) -> void:
 	if is_multiplayer_authority():
 		hud.actualizar_salud(0.0, salud_maxima)
 		hud.mostrar_estado_derribado(derribado)
+
+@rpc("any_peer", "call_local")
+func sincronizar_auto_reanimacion() -> void:
+	salud_actual = 50.0
+	esta_derribado = false
+	if is_multiplayer_authority():
+		hud.actualizar_salud(salud_actual, salud_maxima)
+		hud.mostrar_estado_derribado(false)

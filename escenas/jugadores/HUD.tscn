@@ -1,0 +1,256 @@
+[gd_scene load_steps=5 format=3 uid="uid://c6r2p5kx7m21q"]
+
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vida_bg"]
+bg_color = Color(0.1, 0.1, 0.1, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vida_fill"]
+bg_color = Color(0.2, 0.8, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
+bg_color = Color(0.85, 0.15, 0.15, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.2, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="CentroReticula" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRectV" type="ColorRect" parent="CentroReticula"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1.0
+offset_top = -6.0
+offset_right = 1.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.8)
+
+[node name="ColorRectH" type="ColorRect" parent="CentroReticula"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -6.0
+offset_top = -1.0
+offset_right = 6.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.8)
+
+[node name="Margen" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="InferiorIzquierda" type="Control" parent="Margen"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margen/InferiorIzquierda"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -75.0
+offset_right = 220.0
+grow_vertical = 0
+theme_override_constants/separation = 6
+
+[node name="LabelRol" type="Label" parent="Margen/InferiorIzquierda/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "ROL: MILITAR"
+
+[node name="BarraVida" type="ProgressBar" parent="Margen/InferiorIzquierda/VBox"]
+custom_minimum_size = Vector2(220, 24)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_vida_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_vida_fill")
+value = 100.0
+show_percentage = false
+
+[node name="LabelSalud" type="Label" parent="Margen/InferiorIzquierda/VBox/BarraVida"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 13
+text = "100 / 100 HP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InferiorDerecha" type="Control" parent="Margen"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margen/InferiorDerecha"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -80.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="LabelArma" type="Label" parent="Margen/InferiorDerecha/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "PISTOLA 9MM"
+horizontal_alignment = 2
+
+[node name="LabelMunicion" type="Label" parent="Margen/InferiorDerecha/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "15 / 60"
+horizontal_alignment = 2
+
+[node name="LabelSuministros" type="Label" parent="Margen/InferiorDerecha/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 15
+text = "$ 0 SUMINISTROS"
+horizontal_alignment = 2
+
+[node name="CentroAlerta" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LabelInteraccion" type="Label" parent="CentroAlerta"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = 40.0
+offset_right = 150.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 15
+text = "[E] REPARAR BARRICADA"
+horizontal_alignment = 1
+
+[node name="PanelDerribado" type="PanelContainer" parent="CentroAlerta"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CentroAlerta/PanelDerribado"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "¡ESTÁS DERRIBADO!
+Espera auxilio de un compañero"
+horizontal_alignment = 1
+
+[node name="SuperiorCentro" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="BannerRegla" type="PanelContainer" parent="SuperiorCentro"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 25.0
+offset_right = 250.0
+offset_bottom = 95.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
+
+[node name="VBox" type="VBoxContainer" parent="SuperiorCentro/BannerRegla"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="TituloRegla" type="Label" parent="SuperiorCentro/BannerRegla/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.3, 1)
+theme_override_font_sizes/font_size = 16
+text = "★ REGLA #1: CARDIO ★"
+horizontal_alignment = 1
+
+[node name="DescRegla" type="Label" parent="SuperiorCentro/BannerRegla/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Mantén la distancia con los infectados para sobrevivir."
+horizontal_alignment = 1
+
+[node name="TimerRegla" type="Timer" parent="SuperiorCentro/BannerRegla"]
+one_shot = true

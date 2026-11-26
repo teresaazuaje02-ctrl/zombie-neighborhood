@@ -1,0 +1,89 @@
+[gd_scene load_steps=5 format=3 uid="uid://b7vnm82m1qp6u"]
+
+[ext_resource type="Script" path="res://scripts/Mundo.gd" id="1_mundo"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.385, 0.455, 0.55, 1)
+sky_horizon_color = Color(0.65, 0.68, 0.71, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+tonemap_mode = 2
+
+[node name="Mundo" type="Node3D"]
+script = ExtResource("1_mundo")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
+shadow_enabled = true
+
+[node name="SueloPruebas" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(40, 1, 40)
+
+[node name="ContenedorJugadores" type="Node3D" parent="."]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://escenas/jugadores/Jugador.tscn")
+spawn_path = NodePath("../ContenedorJugadores")
+
+[node name="MenuLobby" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="MenuLobby"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -140.0
+offset_right = 180.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuLobby/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="MenuLobby/Panel/VBoxContainer"]
+layout_mode = 2
+text = "ZOMBIE NEIGHBORHOOD (LOBBY)"
+horizontal_alignment = 1
+
+[node name="LabelRol" type="Label" parent="MenuLobby/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Selecciona tu Rol:"
+
+[node name="RolSelector" type="OptionButton" parent="MenuLobby/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="MenuLobby/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HostBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Crear Partida (Host)"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLobby/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="IPInput" type="LineEdit" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "127.0.0.1"
+
+[node name="UnirseBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Unirse por IP"
+
+[connection signal="pressed" from="MenuLobby/Panel/VBoxContainer/HostBtn" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="MenuLobby/Panel/VBoxContainer/HBoxContainer/UnirseBtn" to="." method="_on_unirse_pressed"]

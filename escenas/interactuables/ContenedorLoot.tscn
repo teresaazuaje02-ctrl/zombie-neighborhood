@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://ba4e21p7qx8ym"]
+
+[ext_resource type="Script" path="res://scripts/ContenedorLoot.gd" id="1_loot"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_caja"]
+size = Vector3(1.0, 0.75, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_caja"]
+albedo_color = Color(0.45, 0.32, 0.18, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_base"]
+material = SubResource("StandardMaterial3D_caja")
+size = Vector3(1.0, 0.6, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tapa"]
+material = SubResource("StandardMaterial3D_caja")
+size = Vector3(1.04, 0.15, 0.84)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_loot"]
+properties/0/path = NodePath(".:ya_saqueado")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:tipo")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+
+[node name="ContenedorLoot" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_loot")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+shape = SubResource("BoxShape3D_caja")
+
+[node name="MallaBase" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+mesh = SubResource("BoxMesh_base")
+
+[node name="MallaTapa" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.4)
+
+[node name="MeshTapa" type="MeshInstance3D" parent="MallaTapa"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0.4)
+mesh = SubResource("BoxMesh_tapa")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_loot")

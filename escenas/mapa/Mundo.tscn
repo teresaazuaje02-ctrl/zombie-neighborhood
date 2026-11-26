@@ -1,7 +1,8 @@
-[gd_scene format=3 uid="uid://b7vnm82m1qp6u"]
+[gd_scene load_steps=9 format=3 uid="uid://b7vnm82m1qp6u"]
 
-[ext_resource type="Script" uid="uid://p73guap3ui4m" path="res://scripts/Mundo.gd" id="1_mundo"]
-[ext_resource type="PackedScene" uid="uid://c3q8ga21pxvme" path="res://escenas/interactuables/Barricada.tscn" id="2_barricada"]
+[ext_resource type="Script" path="res://scripts/Mundo.gd" id="1_mundo"]
+[ext_resource type="PackedScene" uid="uid://c3q8f921pxvme" path="res://escenas/interactuables/Barricada.tscn" id="2_barricada"]
+[ext_resource type="PackedScene" uid="uid://ba4e21p7qx8ym" path="res://escenas/interactuables/ContenedorLoot.tscn" id="3_loot"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.385, 0.455, 0.55, 1)
@@ -22,47 +23,52 @@ polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_suelo"]
 albedo_color = Color(0.2, 0.22, 0.25, 1)
 
-[node name="Mundo" type="Node3D" unique_id=138005128]
+[node name="Mundo" type="Node3D"]
 script = ExtResource("1_mundo")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=113590363]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1992940642]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
 shadow_enabled = true
 
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1627137383]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.095822334, 0.018210411, 0.041012526)
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
 navigation_mesh = SubResource("NavigationMesh_1")
 
-[node name="SueloPruebas" type="CSGBox3D" parent="NavigationRegion3D" unique_id=227698207]
+[node name="SueloPruebas" type="CSGBox3D" parent="NavigationRegion3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(50, 1, 50)
 material = SubResource("StandardMaterial3D_suelo")
 
-[node name="BarricadaPrueba" parent="NavigationRegion3D" unique_id=873651929 instance=ExtResource("2_barricada")]
+[node name="BarricadaPrueba" parent="NavigationRegion3D" instance=ExtResource("2_barricada")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 
-[node name="ContenedorJugadores" type="Node3D" parent="." unique_id=984824708]
+[node name="CajaLoot1" parent="NavigationRegion3D" instance=ExtResource("3_loot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2053683008]
-_spawnable_scenes = PackedStringArray("uid://df2m4xk3p7e1l")
+[node name="CajaLoot2" parent="NavigationRegion3D" instance=ExtResource("3_loot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
+
+[node name="ContenedorJugadores" type="Node3D" parent="."]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://escenas/jugadores/Jugador.tscn")
 spawn_path = NodePath("../ContenedorJugadores")
 
-[node name="ContenedorZombis" type="Node3D" parent="." unique_id=301894671]
+[node name="ContenedorZombis" type="Node3D" parent="."]
 
-[node name="MultiplayerSpawnerZombis" type="MultiplayerSpawner" parent="." unique_id=267755956]
-_spawnable_scenes = PackedStringArray("uid://c51nxm4r7yq2w")
+[node name="MultiplayerSpawnerZombis" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://escenas/enemigos/Zombi.tscn")
 spawn_path = NodePath("../ContenedorZombis")
 
-[node name="TimerOleadas" type="Timer" parent="." unique_id=180513391]
+[node name="TimerOleadas" type="Timer" parent="."]
 wait_time = 4.0
 
-[node name="MenuLobby" type="CanvasLayer" parent="." unique_id=1736446015]
+[node name="MenuLobby" type="CanvasLayer" parent="."]
 
-[node name="Panel" type="PanelContainer" parent="MenuLobby" unique_id=1754213151]
+[node name="Panel" type="PanelContainer" parent="MenuLobby"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -75,38 +81,38 @@ offset_bottom = 140.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MenuLobby/Panel" unique_id=563881790]
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuLobby/Panel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Titulo" type="Label" parent="MenuLobby/Panel/VBoxContainer" unique_id=444798613]
+[node name="Titulo" type="Label" parent="MenuLobby/Panel/VBoxContainer"]
 layout_mode = 2
 text = "ZOMBIE NEIGHBORHOOD (LOBBY)"
 horizontal_alignment = 1
 
-[node name="LabelRol" type="Label" parent="MenuLobby/Panel/VBoxContainer" unique_id=2126196326]
+[node name="LabelRol" type="Label" parent="MenuLobby/Panel/VBoxContainer"]
 layout_mode = 2
 text = "Selecciona tu Rol:"
 
-[node name="RolSelector" type="OptionButton" parent="MenuLobby/Panel/VBoxContainer" unique_id=849067605]
+[node name="RolSelector" type="OptionButton" parent="MenuLobby/Panel/VBoxContainer"]
 layout_mode = 2
 
-[node name="HSeparator" type="HSeparator" parent="MenuLobby/Panel/VBoxContainer" unique_id=2029673102]
+[node name="HSeparator" type="HSeparator" parent="MenuLobby/Panel/VBoxContainer"]
 layout_mode = 2
 
-[node name="HostBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer" unique_id=164670752]
+[node name="HostBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer"]
 layout_mode = 2
 text = "Crear Partida (Host)"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLobby/Panel/VBoxContainer" unique_id=1791468377]
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLobby/Panel/VBoxContainer"]
 layout_mode = 2
 
-[node name="IPInput" type="LineEdit" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer" unique_id=743836844]
+[node name="IPInput" type="LineEdit" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "127.0.0.1"
 
-[node name="UnirseBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer" unique_id=252765245]
+[node name="UnirseBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Unirse por IP"
 

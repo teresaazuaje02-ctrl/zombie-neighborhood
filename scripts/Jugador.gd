@@ -20,15 +20,15 @@ var multiplicador_velocidad: float = 1.0
 var multiplicador_recarga: float = 1.0
 var multiplicador_reparacion: float = 1.0
 
-# Sistema de Munición y Recarga
+# Inventario, Munición y Economía
 var cargador_maximo: int = 15
 var cargador_actual: int = 15
 var municion_reserva: int = 60
 var recargando: bool = false
 var tiempo_recarga_base: float = 1.4
 
-# Economía / Suministros acumulados
 var suministros: int = 0
+var botiquines_auto_reanimar: int = 0
 
 # Timers de disparo
 var puede_disparar: bool = true
@@ -57,7 +57,6 @@ func _ready() -> void:
 		hud.actualizar_municion(cargador_actual, municion_reserva)
 		hud.actualizar_suministros(suministros)
 		hud.configurar_rol(_obtener_nombre_rol())
-		# Mostrar regla inicial estilo Zombieland
 		hud.mostrar_regla(1, "Cardio", "Mantén el ritmo al correr; los infectados no se cansan.")
 	else:
 		camara.current = false
@@ -73,19 +72,20 @@ func _obtener_nombre_rol() -> String:
 
 func aplicar_bonificaciones_rol() -> void:
 	match rol:
-		0: # MEDICO
+		0: # MEDICO (Inicia con 1 Botiquín de Auto-Reanimamiento)
 			multiplicador_reparacion = 1.0
 			danio_arma_inicial = 35.0
 			cargador_maximo = 15
+			botiquines_auto_reanimar = 1
 		1: # MILITAR (+35% cargador, -40% tiempo recarga)
 			multiplicador_recarga = 0.6
 			danio_arma_inicial = 28.0
-			cargador_maximo = int(15 * 1.35) # ~20 balas
+			cargador_maximo = int(15 * 1.35)
 			cargador_actual = cargador_maximo
-		2: # CARPINTERO
+		2: # CARPINTERO (Doble velocidad / doble tablón)
 			multiplicador_reparacion = 2.0
 			danio_arma_inicial = 35.0
-		3: # EXPLORADOR (+15% velocidad)
+		3: # EXPLORADOR (+15% velocidad, +35% botín)
 			multiplicador_velocidad = 1.15
 			danio_arma_inicial = 35.0
 
@@ -117,18 +117,14 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
-	# Detección de objetos interactuables al mirar hacia ellos
 	actualizar_prompt_interaccion()
 
-	# Procesar Disparo
 	if Input.is_action_just_pressed("disparar") and puede_disparar and not recargando:
 		ejecutar_disparo()
 
-	# Procesar Recarga (Tecla R)
 	if Input.is_action_just_pressed("recargar") and not recargando:
 		ejecutar_recarga()
 
-	# Procesar Interacción (Tecla E)
 	if Input.is_action_just_pressed("interactuar"):
 		ejecutar_interaccion()
 
@@ -153,11 +149,11 @@ func _physics_process(delta: float) -> void:
 func actualizar_prompt_interaccion() -> void:
 	if raycast_disparo.is_colliding():
 		var col = raycast_disparo.get_collider()
-		if col and col.has_method("intentar_reparar"):
+		if col and col.has_method("intentar_reparar") and col.tablones_actuales < 4:
 			hud.mostrar_prompt_interaccion("[E] Reparar Barricada", true)
 			return
-		elif col and col.has_method("saquear"):
-			hud.mostrar_prompt_interaccion("[E] Saquear Suministros", true)
+		elif col and col.has_method("saquear") and not col.ya_saqueado:
+			hud.mostrar_prompt_interaccion("[E] Saquear Contenedor", true)
 			return
 	hud.mostrar_prompt_interaccion("", false)
 
@@ -197,10 +193,31 @@ func ejecutar_recarga() -> void:
 func ejecutar_interaccion() -> void:
 	if raycast_disparo.is_colliding():
 		var objeto = raycast_disparo.get_collider()
-		if objeto and objeto.has_method("intentar_reparar"):
-			var es_carpintero = (rol == 2)
-			objeto.intentar_reparar(es_carpintero)
-			hud.mostrar_regla(17, "No seas un héroe", "Mantener las barricadas en pie salva vidas.")
+		if objeto:
+			if objeto.has_method("intentar_reparar"):
+				var es_carpintero = (rol == 2)
+				var pudo = objeto.intentar_reparar(es_carpintero)
+				if pudo:
+					hud.mostrar_regla(17, "No seas un héroe", "Mantener las barricadas en pie salva vidas.")
+			elif objeto.has_method("saquear"):
+				objeto.saquear(self)
+
+func recibir_botin(botin: Dictionary) -> void:
+	suministros += botin.get("suministros", 0)
+	municion_reserva += botin.get("municion", 0)
+	
+	if botin.get("botiquin", false):
+		botiquines_auto_reanimar += 1
+
+	if is_multiplayer_authority():
+		hud.actualizar_suministros(suministros)
+		hud.actualizar_municion(cargador_actual, municion_reserva)
+		
+		var texto_botin = "+$%d Suministros | +%d Balas" % [botin.get("suministros", 0), botin.get("municion", 0)]
+		if botin.get("botiquin", false):
+			texto_botin += " | ¡Botiquín encontrado!"
+
+		hud.mostrar_regla(32, "Disfruta las pequeñas cosas", texto_botin)
 
 @rpc("any_peer", "call_local")
 func servidor_aplicar_danio_a_enemigo(ruta_enemigo: NodePath, cantidad: float) -> void:

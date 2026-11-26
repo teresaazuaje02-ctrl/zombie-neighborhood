@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://df2m4xk3p7e1l"]
+[gd_scene load_steps=12 format=3 uid="uid://df2m4xk3p7e1l"]
 
 [ext_resource type="Script" path="res://scripts/Jugador.gd" id="1_jugador"]
 [ext_resource type="PackedScene" uid="uid://c6r2p5kx7m21q" path="res://escenas/jugadores/HUD.tscn" id="2_hud"]
@@ -10,6 +10,32 @@ height = 1.8
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
 radius = 0.4
 height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pistola"]
+albedo_color = Color(0.18, 0.19, 0.22, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_canon"]
+material = SubResource("StandardMaterial3D_pistola")
+size = Vector3(0.06, 0.08, 0.28)
+
+[sub_resource type="BoxMesh" id="BoxMesh_empunadura"]
+material = SubResource("StandardMaterial3D_pistola")
+size = Vector3(0.05, 0.16, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_madera"]
+albedo_color = Color(0.55, 0.38, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bate"]
+material = SubResource("StandardMaterial3D_madera")
+top_radius = 0.05
+bottom_radius = 0.025
+height = 0.75
+
+[sub_resource type="BoxMesh" id="BoxMesh_clavo"]
+size = Vector3(0.12, 0.015, 0.015)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_1"]
 properties/0/path = NodePath(".:position")
@@ -46,6 +72,41 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 [node name="RayCastDisparo" type="RayCast3D" parent="Cabeza"]
 target_position = Vector3(0, 0, -40)
 collision_mask = 5
+
+[node name="SocketArma" type="Node3D" parent="Cabeza/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, -0.22, -0.42)
+
+[node name="Pistola9mm" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
+
+[node name="Canon" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/Pistola9mm"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.08)
+mesh = SubResource("BoxMesh_canon")
+
+[node name="Empunadura" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/Pistola9mm"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, -0.06, 0.02)
+mesh = SubResource("BoxMesh_empunadura")
+
+[node name="BateClavos" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
+transform = Transform3D(0.866025, 0.5, 0, -0.353553, 0.612372, -0.707107, -0.353553, 0.612372, 0.707107, 0, 0.1, -0.1)
+visible = false
+
+[node name="CuerpoBate" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/BateClavos"]
+mesh = SubResource("CylinderMesh_bate")
+
+[node name="Clavo1" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/BateClavos"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("BoxMesh_clavo")
+
+[node name="Clavo2" type="MeshInstance3D" parent="Cabeza/Camera3D/SocketArma/BateClavos"]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0.28, 0)
+mesh = SubResource("BoxMesh_clavo")
+
+[node name="Fogonazo" type="OmniLight3D" parent="Cabeza/Camera3D/SocketArma"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.26)
+visible = false
+light_color = Color(1, 0.9, 0.4, 1)
+light_energy = 4.0
+omni_range = 4.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_1")

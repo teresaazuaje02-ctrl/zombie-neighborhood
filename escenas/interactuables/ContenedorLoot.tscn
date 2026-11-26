@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://ba4e21p7qx8ym"]
+[gd_scene format=3 uid="uid://ba4e21p7qx8ym"]
 
 [ext_resource type="Script" path="res://scripts/ContenedorLoot.gd" id="1_loot"]
 

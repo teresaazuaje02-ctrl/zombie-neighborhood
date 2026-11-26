@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 # Controlador de Personaje (FPS) para el Escuadrón de Supervivientes
 # Compatible con replicación multijugador nativa de Godot 4.
+# Incluye soporte para modelos 3D de armas (.glb de Tripo3D), retroceso y balanceo (sway).
 
 @export var velocidad_base: float = 4.5
 @export var velocidad_sprint: float = 7.0
@@ -20,7 +21,7 @@ var multiplicador_velocidad: float = 1.0
 var multiplicador_recarga: float = 1.0
 var multiplicador_reparacion: float = 1.0
 
-# Inventario, Munición y Economía
+# Inventario y Munición
 var cargador_maximo: int = 15
 var cargador_actual: int = 15
 var municion_reserva: int = 60
@@ -34,12 +35,21 @@ var botiquines_auto_reanimar: int = 0
 var puede_disparar: bool = true
 var cadencia_disparo: float = 0.25
 
+# Referencias de Nodos
 @onready var cabeza: Node3D = $Cabeza
 @onready var camara: Camera3D = $Cabeza/Camera3D
 @onready var raycast_disparo: RayCast3D = $Cabeza/RayCastDisparo
 @onready var sincronizador: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @onready var hud: CanvasLayer = $HUD
 
+# Socket de Armas en Primera Persona
+@onready var socket_arma: Node3D = $Cabeza/Camera3D/SocketArma
+@onready var malla_pistola: Node3D = $Cabeza/Camera3D/SocketArma/Pistola9mm
+@onready var malla_bate: Node3D = $Cabeza/Camera3D/SocketArma/BateClavos
+@onready var fogonazo: OmniLight3D = $Cabeza/Camera3D/SocketArma/Fogonazo
+
+var posicion_original_arma: Vector3 = Vector3(0.24, -0.22, -0.42)
+var retroceso_actual: Vector3 = Vector3.ZERO
 var gravedad: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _enter_tree() -> void:
@@ -53,6 +63,8 @@ func _ready() -> void:
 		camara.current = true
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		hud.visible = true
+		socket_arma.visible = true
+		actualizar_modelo_arma_visible()
 		hud.actualizar_salud(salud_actual, salud_maxima)
 		hud.actualizar_municion(cargador_actual, municion_reserva)
 		hud.actualizar_suministros(suministros)
@@ -61,6 +73,16 @@ func _ready() -> void:
 	else:
 		camara.current = false
 		hud.visible = false
+		# Ocultar arma en primera persona para otros clientes
+		socket_arma.visible = false
+
+func actualizar_modelo_arma_visible() -> void:
+	if rol == 1: # Militar inicia con arma de fuego (Pistola)
+		malla_pistola.visible = true
+		malla_bate.visible = false
+	else: # Médico, Carpintero y Explorador inician con Bate
+		malla_pistola.visible = false
+		malla_bate.visible = true
 
 func _obtener_nombre_rol() -> String:
 	match rol:
@@ -72,7 +94,7 @@ func _obtener_nombre_rol() -> String:
 
 func aplicar_bonificaciones_rol() -> void:
 	match rol:
-		0: # MEDICO (Inicia con 1 Botiquín de Auto-Reanimamiento)
+		0: # MEDICO
 			multiplicador_reparacion = 1.0
 			danio_arma_inicial = 35.0
 			cargador_maximo = 15
@@ -97,6 +119,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-event.relative.x * sensibilidad_raton)
 		cabeza.rotate_x(-event.relative.y * sensibilidad_raton)
 		cabeza.rotation.x = clamp(cabeza.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
+		
+		# Balanceo de arma por rotación de cámara (Weapon Sway)
+		socket_arma.position.x = posicion_original_arma.x - (event.relative.x * 0.0003)
+		socket_arma.position.y = posicion_original_arma.y + (event.relative.y * 0.0003)
 
 	if event.is_action_pressed("ui_cancel"):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -110,6 +136,10 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity.y -= gravedad * delta
+
+	# Suavizar recuperación del retroceso y posición del arma
+	socket_arma.position = socket_arma.position.lerp(posicion_original_arma + retroceso_actual, 12.0 * delta)
+	retroceso_actual = retroceso_actual.lerp(Vector3.ZERO, 15.0 * delta)
 
 	if esta_derribado:
 		velocity.x = move_toward(velocity.x, 0.0, 5.0 * delta)
@@ -158,14 +188,21 @@ func actualizar_prompt_interaccion() -> void:
 	hud.mostrar_prompt_interaccion("", false)
 
 func ejecutar_disparo() -> void:
-	if cargador_actual <= 0:
+	if rol == 1 and cargador_actual <= 0:
 		ejecutar_recarga()
 		return
 
 	puede_disparar = false
-	cargador_actual -= 1
-	hud.actualizar_municion(cargador_actual, municion_reserva)
-	
+
+	if rol == 1: # Militar dispara con munición
+		cargador_actual -= 1
+		hud.actualizar_municion(cargador_actual, municion_reserva)
+		# Retroceso de arma de fuego hacia atrás y hacia arriba
+		retroceso_actual = Vector3(0.0, 0.03, 0.08)
+		activar_fogonazo()
+	else: # Ataque cuerpo a cuerpo (Bate con clavos)
+		retroceso_actual = Vector3(-0.06, -0.04, 0.1)
+
 	if raycast_disparo.is_colliding():
 		var objetivo = raycast_disparo.get_collider()
 		if objetivo and objetivo.is_in_group("enemigos"):
@@ -174,12 +211,19 @@ func ejecutar_disparo() -> void:
 	await get_tree().create_timer(cadencia_disparo).timeout
 	puede_disparar = true
 
+func activar_fogonazo() -> void:
+	fogonazo.visible = true
+	await get_tree().create_timer(0.05).timeout
+	fogonazo.visible = false
+
 func ejecutar_recarga() -> void:
-	if cargador_actual == cargador_maximo or municion_reserva <= 0 or recargando:
+	if rol != 1 or cargador_actual == cargador_maximo or municion_reserva <= 0 or recargando:
 		return
 
 	recargando = true
 	var tiempo = tiempo_recarga_base * multiplicador_recarga
+	# Animación simple de bajada de arma durante la recarga
+	retroceso_actual = Vector3(0.0, -0.2, 0.05)
 	await get_tree().create_timer(tiempo).timeout
 
 	var faltante = cargador_maximo - cargador_actual

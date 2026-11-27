@@ -1,46 +1,47 @@
-[gd_scene load_steps=5 format=3 uid="uid://b7vnm82m1qp6u"]
+[gd_scene format=3 uid="uid://b7vnm82m1qp6u"]
 
-[ext_resource type="Script" path="res://scripts/Mundo.gd" id="1_mundo"]
-[ext_resource type="PackedScene" uid="uid://df6y58px4k91v" path="res://escenas/mapa/Barrio.tscn" id="2_barrio"]
-[ext_resource type="PackedScene" uid="uid://c3q8f921pxvme" path="res://escenas/interactuables/Barricada.tscn" id="3_barricada"]
+[ext_resource type="Script" uid="uid://p73guap3ui4m" path="res://scripts/Mundo.gd" id="1_mundo"]
+[ext_resource type="PackedScene" uid="uid://df6y58px4la1v" path="res://escenas/mapa/Barrio.tscn" id="2_barrio"]
+[ext_resource type="PackedScene" uid="uid://c3q8ga21pxvme" path="res://escenas/interactuables/Barricada.tscn" id="3_barricada"]
 [ext_resource type="PackedScene" uid="uid://ba4e21p7qx8ym" path="res://escenas/interactuables/ContenedorLoot.tscn" id="4_loot"]
-[ext_resource type="Script" path="res://scripts/OleadaManager.gd" id="5_oleadas"]
+[ext_resource type="Script" uid="uid://cymin45xiquox" path="res://scripts/OleadaManager.gd" id="5_oleadas"]
 
-[node name="Mundo" type="Node3D"]
+[node name="Mundo" type="Node3D" unique_id=648722372]
 script = ExtResource("1_mundo")
 
-[node name="Barrio" parent="." instance=ExtResource("2_barrio")]
+[node name="Barrio" parent="." unique_id=2077439531 instance=ExtResource("2_barrio")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.44828856, -0.019263148, -0.23770428)
 
-[node name="BarricadaEntradaNorte" parent="." instance=ExtResource("3_barricada")]
+[node name="BarricadaEntradaNorte" parent="." unique_id=734709679 instance=ExtResource("3_barricada")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -45)
 
-[node name="CajaLootRefugio" parent="." instance=ExtResource("4_loot")]
+[node name="CajaLootRefugio" parent="." unique_id=1673117179 instance=ExtResource("4_loot")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -52)
 
-[node name="CajaLootTienda" parent="." instance=ExtResource("4_loot")]
+[node name="CajaLootTienda" parent="." unique_id=124841388 instance=ExtResource("4_loot")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -32)
 
-[node name="ContenedorJugadores" type="Node3D" parent="."]
+[node name="ContenedorJugadores" type="Node3D" parent="." unique_id=1454833260]
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://escenas/jugadores/Jugador.tscn")
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=749333253]
+_spawnable_scenes = PackedStringArray("uid://df2m4xk3p7e1l")
 spawn_path = NodePath("../ContenedorJugadores")
 
-[node name="ContenedorZombis" type="Node3D" parent="."]
+[node name="ContenedorZombis" type="Node3D" parent="." unique_id=1232631904]
 
-[node name="MultiplayerSpawnerZombis" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://escenas/enemigos/Zombi.tscn")
+[node name="MultiplayerSpawnerZombis" type="MultiplayerSpawner" parent="." unique_id=190049881]
+_spawnable_scenes = PackedStringArray("uid://c51nxm4r7yq2w")
 spawn_path = NodePath("../ContenedorZombis")
 
-[node name="TimerOleadas" type="Timer" parent="."]
+[node name="TimerOleadas" type="Timer" parent="." unique_id=598664187]
 wait_time = 4.0
 
-[node name="OleadaManager" type="Node" parent="." groups=["gestor_oleadas"]]
+[node name="OleadaManager" type="Node" parent="." unique_id=539879422 groups=["gestor_oleadas"]]
 script = ExtResource("5_oleadas")
 
-[node name="MenuLobby" type="CanvasLayer" parent="."]
+[node name="MenuLobby" type="CanvasLayer" parent="." unique_id=779110665]
 
-[node name="Panel" type="PanelContainer" parent="MenuLobby"]
+[node name="Panel" type="PanelContainer" parent="MenuLobby" unique_id=260237620]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -53,38 +54,38 @@ offset_bottom = 140.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MenuLobby/Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuLobby/Panel" unique_id=1791770320]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Titulo" type="Label" parent="MenuLobby/Panel/VBoxContainer"]
+[node name="Titulo" type="Label" parent="MenuLobby/Panel/VBoxContainer" unique_id=997301406]
 layout_mode = 2
 text = "ZOMBIE NEIGHBORHOOD (LOBBY)"
 horizontal_alignment = 1
 
-[node name="LabelRol" type="Label" parent="MenuLobby/Panel/VBoxContainer"]
+[node name="LabelRol" type="Label" parent="MenuLobby/Panel/VBoxContainer" unique_id=1443591190]
 layout_mode = 2
 text = "Selecciona tu Rol:"
 
-[node name="RolSelector" type="OptionButton" parent="MenuLobby/Panel/VBoxContainer"]
+[node name="RolSelector" type="OptionButton" parent="MenuLobby/Panel/VBoxContainer" unique_id=1993591209]
 layout_mode = 2
 
-[node name="HSeparator" type="HSeparator" parent="MenuLobby/Panel/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="MenuLobby/Panel/VBoxContainer" unique_id=673108410]
 layout_mode = 2
 
-[node name="HostBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer"]
+[node name="HostBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer" unique_id=1662382420]
 layout_mode = 2
 text = "Crear Partida (Host)"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLobby/Panel/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLobby/Panel/VBoxContainer" unique_id=873002518]
 layout_mode = 2
 
-[node name="IPInput" type="LineEdit" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer"]
+[node name="IPInput" type="LineEdit" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer" unique_id=2082987496]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "127.0.0.1"
 
-[node name="UnirseBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer"]
+[node name="UnirseBtn" type="Button" parent="MenuLobby/Panel/VBoxContainer/HBoxContainer" unique_id=1893072120]
 layout_mode = 2
 text = "Unirse por IP"
 

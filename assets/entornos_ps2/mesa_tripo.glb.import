@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dkn00wbdiag4"
-path="res://.godot/imported/pistola_tripo.glb-a03ed1a091fbdee8f826d4ae1d44ec6b.scn"
+uid="uid://bpmogh6q70w6a"
+path="res://.godot/imported/mesa_tripo.glb-3137a6068e043b12936cd902342b1d53.scn"
 
 [deps]
 
-source_file="res://assets/armas/pistola_tripo.glb"
-dest_files=["res://.godot/imported/pistola_tripo.glb-a03ed1a091fbdee8f826d4ae1d44ec6b.scn"]
+source_file="res://assets/entornos_ps2/mesa_tripo.glb"
+dest_files=["res://.godot/imported/mesa_tripo.glb-3137a6068e043b12936cd902342b1d53.scn"]
 
 [params]
 

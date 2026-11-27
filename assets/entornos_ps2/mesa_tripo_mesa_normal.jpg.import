@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bdkirxwxgpops"
-path.s3tc="res://.godot/imported/pistola_tripo_low_poly_9mm_pistol_3d_model_normal.png-126205c35b8e610531c8fffcfce71d97.s3tc.ctex"
+uid="uid://4xuoc6mlqgkk"
+path.s3tc="res://.godot/imported/mesa_tripo_mesa_normal.jpg-f433ba2bd28752d0d5c4ccfd675e19aa.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "1516d6a50dfefa6202a097e572087b73"
+"md5": "b7d286af8bf4e56ede26ae637cf55db4"
 }
 
 [deps]
 
-source_file="res://assets/armas/pistola_tripo_low_poly_9mm_pistol_3d_model_normal.png"
-dest_files=["res://.godot/imported/pistola_tripo_low_poly_9mm_pistol_3d_model_normal.png-126205c35b8e610531c8fffcfce71d97.s3tc.ctex"]
+source_file="res://assets/entornos_ps2/mesa_tripo_mesa_normal.jpg"
+dest_files=["res://.godot/imported/mesa_tripo_mesa_normal.jpg-f433ba2bd28752d0d5c4ccfd675e19aa.s3tc.ctex"]
 
 [params]
 
@@ -30,7 +30,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://assets/armas/pistola_tripo_low_poly_9mm_pistol_3d_model_normal.png"
+roughness/src_normal="res://assets/entornos_ps2/mesa_tripo_mesa_normal.jpg"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

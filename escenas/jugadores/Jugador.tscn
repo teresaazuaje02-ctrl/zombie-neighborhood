@@ -1,12 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://df2m4xk3p7e1l"]
+[gd_scene load_steps=10 format=3 uid="uid://df2m4xk3p7e1l"]
 
 [ext_resource type="Script" path="res://scripts/Jugador.gd" id="1_jugador"]
 [ext_resource type="PackedScene" uid="uid://c6r2p5kx7m21q" path="res://escenas/jugadores/HUD.tscn" id="2_hud"]
-[ext_resource type="PackedScene" path="res://assets/armas/pistola_tripo.glb" id="3_pistola_tripo"]
-[ext_resource type="PackedScene" path="res://assets/armas/bate_tripo.glb" id="4_bate_tripo"]
-[ext_resource type="PackedScene" path="res://assets/armas/escopeta_tripo.glb" id="5_escopeta_tripo"]
-[ext_resource type="PackedScene" path="res://assets/armas/rifle_tripo.glb" id="6_rifle_tripo"]
-[ext_resource type="PackedScene" path="res://assets/armas/subfusil_tripo.glb" id="7_subfusil_tripo"]
+[ext_resource type="PackedScene" path="res://assets/armas/pistola.fbx" id="3_pistola"]
+[ext_resource type="PackedScene" path="res://assets/armas/bate.fbx" id="4_bate"]
+[ext_resource type="PackedScene" path="res://assets/armas/escopeta.fbx" id="5_escopeta"]
+[ext_resource type="PackedScene" path="res://assets/armas/hacha.fbx" id="6_hacha"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
@@ -15,19 +14,6 @@ height = 1.8
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
 radius = 0.4
 height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_madera"]
-albedo_color = Color(0.55, 0.38, 0.2, 1)
-roughness = 0.9
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_bate"]
-material = SubResource("StandardMaterial3D_madera")
-top_radius = 0.05
-bottom_radius = 0.025
-height = 0.75
-
-[sub_resource type="BoxMesh" id="BoxMesh_clavo"]
-size = Vector3(0.12, 0.015, 0.015)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_1"]
 properties/0/path = NodePath(".:position")
@@ -70,32 +56,28 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.18, -0.38)
 
 [node name="Pistola9mm" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 
-[node name="ModeloTripo" parent="Cabeza/Camera3D/SocketArma/Pistola9mm" instance=ExtResource("3_pistola_tripo")]
+[node name="ModeloTripo" parent="Cabeza/Camera3D/SocketArma/Pistola9mm" instance=ExtResource("3_pistola")]
 transform = Transform3D(0, 0, 0.18, 0, 0.18, 0, -0.18, 0, 0, 0, 0, 0)
 
 [node name="BateClavos" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 visible = false
 
-[node name="ModeloBate" parent="Cabeza/Camera3D/SocketArma/BateClavos" instance=ExtResource("4_bate_tripo")]
+[node name="ModeloBate" parent="Cabeza/Camera3D/SocketArma/BateClavos" instance=ExtResource("4_bate")]
 
 [node name="Escopeta" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(0, 0, 0.2, 0, 0.2, 0, -0.2, 0, 0, 0, 0, 0)
 visible = false
 
-[node name="ModeloEscopeta" parent="Cabeza/Camera3D/SocketArma/Escopeta" instance=ExtResource("5_escopeta_tripo")]
+[node name="ModeloEscopeta" parent="Cabeza/Camera3D/SocketArma/Escopeta" instance=ExtResource("5_escopeta")]
 
 [node name="Rifle" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(0, 0, 0.2, 0, 0.2, 0, -0.2, 0, 0, 0, 0, 0)
 visible = false
 
-[node name="ModeloRifle" parent="Cabeza/Camera3D/SocketArma/Rifle" instance=ExtResource("6_rifle_tripo")]
-
 [node name="Subfusil" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(0, 0, 0.2, 0, 0.2, 0, -0.2, 0, 0, 0, 0, 0)
 visible = false
-
-[node name="ModeloSubfusil" parent="Cabeza/Camera3D/SocketArma/Subfusil" instance=ExtResource("7_subfusil_tripo")]
 
 [node name="Fogonazo" type="OmniLight3D" parent="Cabeza/Camera3D/SocketArma"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.26)

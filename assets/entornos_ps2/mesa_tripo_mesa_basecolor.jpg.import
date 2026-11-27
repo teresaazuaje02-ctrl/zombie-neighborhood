@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nro47aypqw5t"
-path.s3tc="res://.godot/imported/pistola_tripo_low_poly_9mm_pistol_3d_model_basecolor.jpg-22b85b552ab5a4b7c042d7ad05f9502b.s3tc.ctex"
+uid="uid://tyxy7l26ocpp"
+path.s3tc="res://.godot/imported/mesa_tripo_mesa_basecolor.jpg-3bc3b6cc5cd6301d40638617abcbe601.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "107a995770cbe290ae29fbe8098385ef"
+"md5": "cb20d38d8146c5f1c0dc20c3f4d4743b"
 }
 
 [deps]
 
-source_file="res://assets/armas/pistola_tripo_low_poly_9mm_pistol_3d_model_basecolor.jpg"
-dest_files=["res://.godot/imported/pistola_tripo_low_poly_9mm_pistol_3d_model_basecolor.jpg-22b85b552ab5a4b7c042d7ad05f9502b.s3tc.ctex"]
+source_file="res://assets/entornos_ps2/mesa_tripo_mesa_basecolor.jpg"
+dest_files=["res://.godot/imported/mesa_tripo_mesa_basecolor.jpg-3bc3b6cc5cd6301d40638617abcbe601.s3tc.ctex"]
 
 [params]
 

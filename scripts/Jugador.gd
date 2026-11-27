@@ -111,16 +111,16 @@ func actualizar_modelo_arma_visible() -> void:
 	if hud:
 		match tipo_arma_equipada:
 			"bate":
-				hud.actualizar_arma_nombre("Bate con Clavos" if not mejoras_compradas.get("bate_electrico", false) else "Bate Eléctrico MK-II")
+				hud.actualizar_arma_nombre("Bate con Clavos" if not mejoras_desbloqueadas.get("bate_electrico", false) else "Bate Eléctrico MK-II")
 				hud.actualizar_municion(-1, -1)
 			"pistola":
-				hud.actualizar_arma_nombre("Pistola 9mm" if not mejoras_compradas.get("pistola_doble_accion", false) else "Pistola Doble Acción MK-II")
+				hud.actualizar_arma_nombre("Pistola 9mm" if not mejoras_desbloqueadas.get("pistola_doble", false) else "Pistola Doble Acción MK-II")
 				hud.actualizar_municion(cargador_actual, municion_reserva)
 			"escopeta":
-				hud.actualizar_arma_nombre("Escopeta" if not mejoras_compradas.get("escopeta_dragon", false) else "Aliento de Dragón MK-II")
+				hud.actualizar_arma_nombre("Escopeta" if not mejoras_desbloqueadas.get("escopeta_dragon", false) else "Aliento de Dragón MK-II")
 				hud.actualizar_municion(cargador_actual, municion_reserva)
 			"rifle":
-				hud.actualizar_arma_nombre("Rifle" if not mejoras_compradas.get("rifle_segador", false) else "Rifle Segador MK-II")
+				hud.actualizar_arma_nombre("Rifle" if not mejoras_desbloqueadas.get("rifle_segador", false) else "Rifle Segador MK-II")
 				hud.actualizar_municion(cargador_actual, municion_reserva)
 			"subfusil":
 				hud.actualizar_arma_nombre("Subfusil")
@@ -269,7 +269,7 @@ func ejecutar_disparo() -> void:
 			var danio_a_aplicar = danio_arma_inicial
 			if tipo_arma_equipada == "bate":
 				danio_a_aplicar = 65.0
-				if mejoras_compradas.get("bate_electrico", false):
+				if mejoras_desbloqueadas.get("bate_electrico", false):
 					danio_a_aplicar = 100.0
 			rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_a_aplicar)
 

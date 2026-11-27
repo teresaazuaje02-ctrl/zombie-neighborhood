@@ -56,7 +56,12 @@ var cadencia_disparo: float = 0.25
 @onready var socket_arma: Node3D = $Cabeza/Camera3D/SocketArma
 @onready var malla_pistola: Node3D = $Cabeza/Camera3D/SocketArma/Pistola9mm
 @onready var malla_bate: Node3D = $Cabeza/Camera3D/SocketArma/BateClavos
+@onready var malla_escopeta: Node3D = $Cabeza/Camera3D/SocketArma/Escopeta
+@onready var malla_rifle: Node3D = $Cabeza/Camera3D/SocketArma/Rifle
+@onready var malla_subfusil: Node3D = $Cabeza/Camera3D/SocketArma/Subfusil
 @onready var fogonazo: OmniLight3D = $Cabeza/Camera3D/SocketArma/Fogonazo
+
+var tipo_arma_equipada: String = "pistola"
 
 var posicion_original_arma: Vector3 = Vector3(0.22, -0.18, -0.38)
 var retroceso_actual: Vector3 = Vector3.ZERO
@@ -68,6 +73,11 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	salud_actual = salud_maxima
 	aplicar_bonificaciones_rol()
+
+	if rol == 1:
+		tipo_arma_equipada = "pistola"
+	else:
+		tipo_arma_equipada = "bate"
 
 	if is_multiplayer_authority():
 		camara.current = true
@@ -92,12 +102,11 @@ func _ready() -> void:
 			malla_propia.visible = true
 
 func actualizar_modelo_arma_visible() -> void:
-	if rol == 1:
-		malla_pistola.visible = true
-		malla_bate.visible = false
-	else:
-		malla_pistola.visible = false
-		malla_bate.visible = true
+	if malla_pistola: malla_pistola.visible = (tipo_arma_equipada == "pistola")
+	if malla_bate: malla_bate.visible = (tipo_arma_equipada == "bate")
+	if malla_escopeta: malla_escopeta.visible = (tipo_arma_equipada == "escopeta")
+	if malla_rifle: malla_rifle.visible = (tipo_arma_equipada == "rifle")
+	if malla_subfusil: malla_subfusil.visible = (tipo_arma_equipada == "subfusil")
 
 func _obtener_nombre_rol() -> String:
 	match rol:
@@ -321,6 +330,17 @@ func equipar_arma_comprada(nombre: String, danio: float, cargador: int, reserva:
 	cargador_actual = cargador
 	municion_reserva += reserva
 	rol = 1 # Pasa a empuñar arma de fuego
+	
+	var n_min = nombre.to_lower()
+	if "escopeta" in n_min or "dragón" in n_min or "dragon" in n_min:
+		tipo_arma_equipada = "escopeta"
+	elif "rifle" in n_min or "segador" in n_min:
+		tipo_arma_equipada = "rifle"
+	elif "subfusil" in n_min:
+		tipo_arma_equipada = "subfusil"
+	else:
+		tipo_arma_equipada = "pistola"
+
 	actualizar_modelo_arma_visible()
 	
 	if is_multiplayer_authority():

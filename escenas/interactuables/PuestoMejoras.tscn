@@ -1,43 +1,10 @@
-[gd_scene format=3 uid="uid://b7v12kkapq8mn"]
+[gd_scene load_steps=5 format=3 uid="uid://b7v12kkapq8mn"]
 
 [ext_resource type="Script" path="res://scripts/PuestoMejoras.gd" id="1_mejoras"]
+[ext_resource type="PackedScene" path="res://assets/entornos_ps2/mesa_tripo.glb" id="2_mesa_tripo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mesa"]
 size = Vector3(2.6, 1.1, 1.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal_mesa"]
-albedo_color = Color(0.28, 0.3, 0.32, 1)
-metallic = 0.6
-roughness = 0.55
-
-[sub_resource type="BoxMesh" id="BoxMesh_tablero"]
-material = SubResource("StandardMaterial3D_metal_mesa")
-size = Vector3(2.6, 0.15, 1.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_patas_madera"]
-albedo_color = Color(0.35, 0.22, 0.12, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BoxMesh_patas"]
-material = SubResource("StandardMaterial3D_patas_madera")
-size = Vector3(2.4, 0.95, 1.0)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_herramientas"]
-albedo_color = Color(0.65, 0.65, 0.68, 1)
-metallic = 0.8
-roughness = 0.3
-
-[sub_resource type="BoxMesh" id="BoxMesh_tornillo"]
-material = SubResource("StandardMaterial3D_herramientas")
-size = Vector3(0.4, 0.35, 0.3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_panel_pared"]
-albedo_color = Color(0.45, 0.42, 0.38, 1)
-roughness = 0.95
-
-[sub_resource type="BoxMesh" id="BoxMesh_panel_trasero"]
-material = SubResource("StandardMaterial3D_panel_pared")
-size = Vector3(2.6, 1.4, 0.08)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mejoras"]
 
@@ -52,21 +19,8 @@ shape = SubResource("BoxShape3D_mesa")
 
 [node name="Visuales" type="Node3D" parent="."]
 
-[node name="PatasMesa" type="MeshInstance3D" parent="Visuales"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.475, 0)
-mesh = SubResource("BoxMesh_patas")
-
-[node name="TableroMesa" type="MeshInstance3D" parent="Visuales"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.025, 0)
-mesh = SubResource("BoxMesh_tablero")
-
-[node name="TornilloBanco" type="MeshInstance3D" parent="Visuales"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.25, 0.3)
-mesh = SubResource("BoxMesh_tornillo")
-
-[node name="PanelHerramientas" type="MeshInstance3D" parent="Visuales"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.55)
-mesh = SubResource("BoxMesh_panel_trasero")
+[node name="MesaTripo" parent="Visuales" instance=ExtResource("2_mesa_tripo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Cartel3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -0.5)

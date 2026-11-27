@@ -355,6 +355,16 @@ func actualizar_hud_suministros() -> void:
 		hud.actualizar_suministros(suministros)
 		hud.actualizar_municion(cargador_actual, municion_reserva)
 
+@rpc("any_peer", "call_local")
+func agregar_suministros(cantidad: int) -> void:
+	var total = cantidad
+	if rol == 3: # Pasiva del Explorador: +35% de suministros
+		total = int(total * 1.35)
+	suministros += total
+	actualizar_hud_suministros()
+	if is_multiplayer_authority():
+		hud.mostrar_regla(1, "Baja de Infectado", "+$%d Suministros" % total)
+
 # Sistema de Comercio
 func abrir_tienda(tienda_ref: Node) -> void:
 	tienda_actual = tienda_ref

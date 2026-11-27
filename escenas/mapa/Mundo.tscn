@@ -21,6 +21,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -52)
 [node name="CajaLootTienda" parent="." unique_id=124841388 instance=ExtResource("4_loot")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -32)
 
+[node name="CajaLootCalleOeste" parent="." instance=ExtResource("4_loot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -18)
+
+[node name="CajaLootCallejon" parent="." instance=ExtResource("4_loot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -12)
+
+[node name="CajaLootMejoras" parent="." instance=ExtResource("4_loot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -32)
+
+[node name="CajaLootCruce" parent="." instance=ExtResource("4_loot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+
 [node name="ContenedorJugadores" type="Node3D" parent="." unique_id=1454833260]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=749333253]

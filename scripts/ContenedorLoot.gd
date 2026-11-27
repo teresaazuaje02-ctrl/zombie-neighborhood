@@ -23,6 +23,7 @@ var ya_saqueado: bool = false
 @onready var sincronizador: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @onready var malla_tapa: Node3D = $MallaTapa
 @onready var malla_base: MeshInstance3D = $MallaBase
+@onready var cartel: Label3D = get_node_or_null("Cartel3D")
 
 func _ready() -> void:
 	actualizar_visual()
@@ -72,6 +73,8 @@ func sincronizar_saqueo(ruta_jugador: NodePath) -> void:
 		saqueado_por.emit(jugador, botin)
 
 func actualizar_visual() -> void:
+	if cartel:
+		cartel.visible = not ya_saqueado
 	if malla_tapa:
 		if ya_saqueado:
 			# Abrir la tapa visualmente (rotación de 75 grados)

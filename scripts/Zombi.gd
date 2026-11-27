@@ -206,6 +206,18 @@ func morir() -> void:
 	if oleada_mgr and oleada_mgr.has_method("registrar_baja_zombi"):
 		oleada_mgr.registrar_baja_zombi()
 
+	# Otorgar recompensa de suministros a los jugadores del escuadrón
+	var recompensa = 25
+	match tipo:
+		TipoZombi.BRUTO: recompensa = 100
+		TipoZombi.CORREDOR: recompensa = 40
+		TipoZombi.ESCUPIDOR, TipoZombi.AULLADOR: recompensa = 50
+
+	var jugadores = get_tree().get_nodes_in_group("jugadores")
+	for j in jugadores:
+		if is_instance_valid(j) and j.has_method("agregar_suministros"):
+			j.rpc("agregar_suministros", recompensa)
+
 	# Notificar a la tienda del tendero si fue eliminado en su perímetro de defensa
 	var tiendas = get_tree().get_nodes_in_group("tienda_npc")
 	for t in tiendas:

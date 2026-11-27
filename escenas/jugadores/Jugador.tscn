@@ -60,7 +60,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.18, -0.38)
 transform = Transform3D(0, 0, 0.18, 0, 0.18, 0, -0.18, 0, 0, 0, 0, 0)
 
 [node name="BateClavos" type="Node3D" parent="Cabeza/Camera3D/SocketArma"]
-transform = Transform3D(0.1646, -0.4279, 0.4608, 0.1439, 0.4893, 0.4030, -0.6121, 0, 0.2186, 0.05, -0.05, 0)
+transform = Transform3D(0.0779, 0.2726, -0.2531, -0.0802, 0.2648, 0.2605, 0.3632, 0, 0.1118, 0.06, -0.04, -0.05)
 visible = false
 
 [node name="ModeloBate" parent="Cabeza/Camera3D/SocketArma/BateClavos" instance=ExtResource("4_bate")]

@@ -250,31 +250,54 @@ func actualizar_prompt_interaccion() -> void:
 	hud.mostrar_prompt_interaccion("", false)
 
 func ejecutar_disparo() -> void:
-	if tipo_arma_equipada != "bate":
-		if cargador_actual <= 0:
-			ejecutar_recarga()
-			return
-		cargador_actual -= 1
-		hud.actualizar_municion(cargador_actual, municion_reserva)
-		retroceso_actual = Vector3(0.0, 0.03, 0.08)
-		activar_fogonazo()
-	else:
-		retroceso_actual = Vector3(-0.06, 0.04, 0.12)
+	if tipo_arma_equipada == "bate":
+		puede_disparar = false
+		animar_golpe_bate()
+		if raycast_disparo.is_colliding():
+			var col_point = raycast_disparo.get_collision_point()
+			var dist = cabeza.global_position.distance_to(col_point)
+			# Rango realista de cuerpo a cuerpo (hasta 2.6 metros)
+			if dist <= 2.6:
+				var objetivo = raycast_disparo.get_collider()
+				if objetivo and objetivo.is_in_group("enemigos"):
+					var danio_a_aplicar = 65.0
+					if mejoras_desbloqueadas.get("bate_electrico", false):
+						danio_a_aplicar = 100.0
+					rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_a_aplicar)
+		await get_tree().create_timer(0.4).timeout
+		puede_disparar = true
+		return
+
+	# Armas de fuego (Pistola, Escopeta, Rifle, Subfusil)
+	if cargador_actual <= 0:
+		ejecutar_recarga()
+		return
+	cargador_actual -= 1
+	hud.actualizar_municion(cargador_actual, municion_reserva)
+	retroceso_actual = Vector3(0.0, 0.03, 0.08)
+	activar_fogonazo()
 
 	puede_disparar = false
 
 	if raycast_disparo.is_colliding():
 		var objetivo = raycast_disparo.get_collider()
 		if objetivo and objetivo.is_in_group("enemigos"):
-			var danio_a_aplicar = danio_arma_inicial
-			if tipo_arma_equipada == "bate":
-				danio_a_aplicar = 65.0
-				if mejoras_desbloqueadas.get("bate_electrico", false):
-					danio_a_aplicar = 100.0
-			rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_a_aplicar)
+			rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_arma_inicial)
 
 	await get_tree().create_timer(cadencia_disparo).timeout
 	puede_disparar = true
+
+func animar_golpe_bate() -> void:
+	if not malla_bate: return
+	var rot_orig = malla_bate.rotation
+	var pos_orig = malla_bate.position
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(malla_bate, "rotation", rot_orig + Vector3(deg_to_rad(-35), deg_to_rad(-55), deg_to_rad(60)), 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(malla_bate, "position", pos_orig + Vector3(-0.15, 0.02, -0.15), 0.12)
+	await tween.finished
+	var tween_back = create_tween().set_parallel(true)
+	tween_back.tween_property(malla_bate, "rotation", rot_orig, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween_back.tween_property(malla_bate, "position", pos_orig, 0.22)
 
 func activar_fogonazo() -> void:
 	fogonazo.visible = true

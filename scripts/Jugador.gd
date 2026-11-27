@@ -108,6 +108,24 @@ func actualizar_modelo_arma_visible() -> void:
 	if malla_rifle: malla_rifle.visible = (tipo_arma_equipada == "rifle")
 	if malla_subfusil: malla_subfusil.visible = (tipo_arma_equipada == "subfusil")
 
+	if hud:
+		match tipo_arma_equipada:
+			"bate":
+				hud.actualizar_arma_nombre("Bate con Clavos" if not mejoras_compradas.get("bate_electrico", false) else "Bate Eléctrico MK-II")
+				hud.actualizar_municion(-1, -1)
+			"pistola":
+				hud.actualizar_arma_nombre("Pistola 9mm" if not mejoras_compradas.get("pistola_doble_accion", false) else "Pistola Doble Acción MK-II")
+				hud.actualizar_municion(cargador_actual, municion_reserva)
+			"escopeta":
+				hud.actualizar_arma_nombre("Escopeta" if not mejoras_compradas.get("escopeta_dragon", false) else "Aliento de Dragón MK-II")
+				hud.actualizar_municion(cargador_actual, municion_reserva)
+			"rifle":
+				hud.actualizar_arma_nombre("Rifle" if not mejoras_compradas.get("rifle_segador", false) else "Rifle Segador MK-II")
+				hud.actualizar_municion(cargador_actual, municion_reserva)
+			"subfusil":
+				hud.actualizar_arma_nombre("Subfusil")
+				hud.actualizar_municion(cargador_actual, municion_reserva)
+
 func _obtener_nombre_rol() -> String:
 	match rol:
 		0: return "Médico"
@@ -146,6 +164,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		socket_arma.position.x = posicion_original_arma.x - (event.relative.x * 0.0003)
 		socket_arma.position.y = posicion_original_arma.y + (event.relative.y * 0.0003)
+
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_1:
+			tipo_arma_equipada = "pistola"
+			actualizar_modelo_arma_visible()
+		elif event.keycode == KEY_2:
+			tipo_arma_equipada = "bate"
+			actualizar_modelo_arma_visible()
+		elif event.keycode == KEY_3:
+			tipo_arma_equipada = "escopeta"
+			actualizar_modelo_arma_visible()
 
 	if event.is_action_pressed("ui_cancel"):
 		if hud and hud.panel_tienda and hud.panel_tienda.visible:
@@ -221,24 +250,28 @@ func actualizar_prompt_interaccion() -> void:
 	hud.mostrar_prompt_interaccion("", false)
 
 func ejecutar_disparo() -> void:
-	if rol == 1 and cargador_actual <= 0:
-		ejecutar_recarga()
-		return
-
-	puede_disparar = false
-
-	if rol == 1:
+	if tipo_arma_equipada != "bate":
+		if cargador_actual <= 0:
+			ejecutar_recarga()
+			return
 		cargador_actual -= 1
 		hud.actualizar_municion(cargador_actual, municion_reserva)
 		retroceso_actual = Vector3(0.0, 0.03, 0.08)
 		activar_fogonazo()
 	else:
-		retroceso_actual = Vector3(-0.06, -0.04, 0.1)
+		retroceso_actual = Vector3(-0.06, 0.04, 0.12)
+
+	puede_disparar = false
 
 	if raycast_disparo.is_colliding():
 		var objetivo = raycast_disparo.get_collider()
 		if objetivo and objetivo.is_in_group("enemigos"):
-			rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_arma_inicial)
+			var danio_a_aplicar = danio_arma_inicial
+			if tipo_arma_equipada == "bate":
+				danio_a_aplicar = 65.0
+				if mejoras_compradas.get("bate_electrico", false):
+					danio_a_aplicar = 100.0
+			rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_a_aplicar)
 
 	await get_tree().create_timer(cadencia_disparo).timeout
 	puede_disparar = true
@@ -249,7 +282,7 @@ func activar_fogonazo() -> void:
 	fogonazo.visible = false
 
 func ejecutar_recarga() -> void:
-	if rol != 1 or cargador_actual == cargador_maximo or municion_reserva <= 0 or recargando:
+	if tipo_arma_equipada == "bate" or cargador_actual == cargador_maximo or municion_reserva <= 0 or recargando:
 		return
 
 	recargando = true

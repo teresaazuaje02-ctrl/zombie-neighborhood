@@ -71,7 +71,10 @@ func configurar_rol(nombre_rol: String) -> void:
 	label_rol.text = "ROL: " + nombre_rol.to_upper()
 
 func actualizar_municion(cargador: int, reserva: int) -> void:
-	label_municion.text = "%d / %d" % [cargador, reserva]
+	if cargador < 0 or reserva < 0:
+		label_municion.text = "CUERPO A CUERPO"
+	else:
+		label_municion.text = "%d / %d" % [cargador, reserva]
 
 func actualizar_arma_nombre(nombre: String) -> void:
 	label_arma.text = nombre.to_upper()

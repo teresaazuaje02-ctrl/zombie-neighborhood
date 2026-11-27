@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://assets/entornos_ps2/mesa_tripo.glb" id="2_mesa_tripo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mesa"]
-size = Vector3(2.6, 1.1, 1.2)
+size = Vector3(2.6, 1.2, 1.4)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mejoras"]
 
@@ -14,13 +14,13 @@ collision_mask = 0
 script = ExtResource("1_mejoras")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_mesa")
 
 [node name="Visuales" type="Node3D" parent="."]
 
 [node name="MesaTripo" parent="Visuales" instance=ExtResource("2_mesa_tripo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(2.4, 0, 0, 0, 2.2, 0, 0, 0, 2.4, 0, 0, 0)
 
 [node name="Cartel3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -0.5)

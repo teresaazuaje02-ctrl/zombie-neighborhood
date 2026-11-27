@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" path="res://assets/personajes/zombi_tripo.glb" id="2_zombi_tripo"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
-radius = 0.4
-height = 1.8
+radius = 0.45
+height = 1.9
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_zombi"]
 properties/0/path = NodePath(".:position")
@@ -27,13 +27,13 @@ collision_mask = 7
 script = ExtResource("1_zombi")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 shape = SubResource("CapsuleShape3D_1")
 
 [node name="VisualesZombi" type="Node3D" parent="."]
 
 [node name="ModeloTripo" parent="VisualesZombi" instance=ExtResource("2_zombi_tripo")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+transform = Transform3D(-1.9, 0, 0, 0, 1.9, 0, 0, 0, -1.9, 0, 0, 0)
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 target_desired_distance = 1.2

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/Barrio.gd" id="1_barrio"]
 [ext_resource type="Terrain3DAssets" path="res://assets/entornos_ps2/terrain_data/terrain_assets.tres" id="2_assets"]
 [ext_resource type="PackedScene" uid="uid://c8n1pk4q8mv3e" path="res://escenas/interactuables/TiendaNPC.tscn" id="3_tienda"]
+[ext_resource type="PackedScene" uid="uid://b7v12kj9pq8mn" path="res://escenas/interactuables/PuestoMejoras.tscn" id="4_mejoras"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vice"]
 sky_top_color = Color(0.24, 0.38, 0.62, 1)
@@ -226,3 +227,6 @@ omni_range = 18.0
 
 [node name="TiendaNPC" parent="." instance=ExtResource("3_tienda")]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 14, 0, -35)
+
+[node name="PuestoMejoras" parent="." instance=ExtResource("4_mejoras")]
+transform = Transform3D(4.37114e-08, 0, 1, 0, 1, 0, -1, 0, 4.37114e-08, -14, 0, -35)

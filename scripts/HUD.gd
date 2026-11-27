@@ -4,6 +4,7 @@ extends CanvasLayer
 # Muestra vida, rol, munición, suministros, retícula, alertas y Menú de Compras.
 
 signal compra_solicitada(articulo: String)
+signal mejora_solicitada(tipo_mejora: String)
 
 @onready var barra_vida: ProgressBar = $Margen/InferiorIzquierda/VBox/BarraVida
 @onready var label_salud: Label = $Margen/InferiorIzquierda/VBox/BarraVida/LabelSalud
@@ -24,7 +25,12 @@ signal compra_solicitada(articulo: String)
 @onready var panel_tienda: PanelContainer = $MenuTienda
 @onready var label_fondos_tienda: Label = $MenuTienda/VBox/FondosLabel
 
+# Menú del Puesto de Mejoras MK-II
+@onready var panel_mejoras: PanelContainer = $MenuMejoras
+@onready var label_fondos_mejoras: Label = $MenuMejoras/VBox/FondosLabel
+
 var tienda_actual: Node = null
+var puesto_mejoras_actual: Node = null
 
 func _ready() -> void:
 	panel_derribado.visible = false
@@ -102,3 +108,36 @@ func _on_comprar_municion_pressed() -> void:
 
 func _on_cerrar_tienda_pressed() -> void:
 	cerrar_tienda()
+
+# Funciones del Menú de Mejoras MK-II
+func abrir_puesto_mejoras(puesto: Node, suministros: int, rol_jugador: int, mejoras_activas: Dictionary) -> void:
+	puesto_mejoras_actual = puesto
+	actualizar_suministros(suministros)
+	if label_fondos_mejoras:
+		var bonus_carpintero = " (50% Desc. en Armas Melee y Barricadas por Carpintero)" if rol_jugador == 2 else ""
+		label_fondos_mejoras.text = "TUS SUMINISTROS: $ %d%s" % [suministros, bonus_carpintero]
+	panel_mejoras.visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func cerrar_puesto_mejoras() -> void:
+	panel_mejoras.visible = false
+	puesto_mejoras_actual = null
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _on_mejorar_bate_pressed() -> void:
+	mejora_solicitada.emit("bate_electrico")
+
+func _on_mejorar_pistola_pressed() -> void:
+	mejora_solicitada.emit("pistola_doble")
+
+func _on_mejorar_escopeta_pressed() -> void:
+	mejora_solicitada.emit("escopeta_dragon")
+
+func _on_mejorar_rifle_pressed() -> void:
+	mejora_solicitada.emit("rifle_segador")
+
+func _on_mejorar_barricada_pressed() -> void:
+	mejora_solicitada.emit("placas_hierro")
+
+func _on_cerrar_mejoras_pressed() -> void:
+	cerrar_puesto_mejoras()

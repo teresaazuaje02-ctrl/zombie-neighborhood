@@ -31,6 +31,14 @@ var tiempo_recarga_base: float = 1.4
 var suministros: int = 0
 var botiquines_auto_reanimar: int = 0
 var tienda_actual: Node = null
+var puesto_mejoras_actual: Node = null
+var mejoras_desbloqueadas: Dictionary = {
+	"bate_electrico": false,
+	"pistola_doble": false,
+	"escopeta_dragon": false,
+	"rifle_segador": false,
+	"placas_hierro": false
+}
 
 # Timers de disparo
 var puede_disparar: bool = true
@@ -75,6 +83,7 @@ func _ready() -> void:
 		hud.configurar_rol(_obtener_nombre_rol())
 		hud.mostrar_regla(1, "Cardio", "Mantén el ritmo al correr; los infectados no se cansan.")
 		hud.compra_solicitada.connect(_al_procesar_compra)
+		hud.mejora_solicitada.connect(_al_procesar_mejora)
 	else:
 		camara.current = false
 		hud.visible = false
@@ -318,6 +327,57 @@ func equipar_arma_comprada(nombre: String, danio: float, cargador: int, reserva:
 		hud.actualizar_arma_nombre(nombre)
 		hud.actualizar_municion(cargador_actual, municion_reserva)
 		hud.actualizar_suministros(suministros)
+
+# Sistema de Puesto de Mejoras MK-II
+func abrir_puesto_mejoras(puesto_ref: Node) -> void:
+	puesto_mejoras_actual = puesto_ref
+	if is_multiplayer_authority():
+		hud.abrir_puesto_mejoras(puesto_ref, suministros, rol, mejoras_desbloqueadas)
+
+func _al_procesar_mejora(tipo_mejora: String) -> void:
+	if not puesto_mejoras_actual:
+		return
+	
+	if mejoras_desbloqueadas.get(tipo_mejora, false):
+		if is_multiplayer_authority():
+			hud.mostrar_regla(31, "Revisa el asiento trasero", "¡Ya tienes instalada esta mejora MK-II!")
+		return
+
+	var exito = puesto_mejoras_actual.procesar_mejora(tipo_mejora, self)
+	if exito:
+		mejoras_desbloqueadas[tipo_mejora] = true
+		actualizar_hud_suministros()
+		hud.mostrar_regla(2, "Doble Tiro", "¡Mejora experimental MK-II ensamblada con éxito!")
+
+func aplicar_mejora_mk2(tipo_mejora: String) -> void:
+	match tipo_mejora:
+		"bate_electrico":
+			danio_arma_inicial = 85.0
+			if is_multiplayer_authority():
+				hud.actualizar_arma_nombre("Bate Eléctrico MK-II")
+		"pistola_doble":
+			danio_arma_inicial = 38.0
+			cargador_maximo = 20
+			cargador_actual = 20
+			cadencia_disparo = 0.18
+			if is_multiplayer_authority():
+				hud.actualizar_arma_nombre("Pistola Doble Acción MK-II")
+				hud.actualizar_municion(cargador_actual, municion_reserva)
+		"escopeta_dragon":
+			danio_arma_inicial = 140.0
+			if is_multiplayer_authority():
+				hud.actualizar_arma_nombre("Aliento de Dragón MK-II")
+		"rifle_segador":
+			danio_arma_inicial = 60.0
+			cargador_maximo = 40
+			cargador_actual = 40
+			if is_multiplayer_authority():
+				hud.actualizar_arma_nombre("Rifle Segador MK-II")
+				hud.actualizar_municion(cargador_actual, municion_reserva)
+		"placas_hierro":
+			multiplicador_reparacion *= 1.5
+			if is_multiplayer_authority():
+				hud.mostrar_regla(17, "No seas un héroe", "Tus fortificaciones ahora están reforzadas con placas de hierro.")
 
 @rpc("any_peer", "call_local")
 func servidor_aplicar_danio_a_enemigo(ruta_enemigo: NodePath, cantidad: float) -> void:

@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/Jugador.gd" id="1_jugador"]
 [ext_resource type="PackedScene" uid="uid://c6r2p5kx7m21q" path="res://escenas/jugadores/HUD.tscn" id="2_hud"]
-[ext_resource type="PackedScene" path="res://assets/armas/pistola.fbx" id="3_pistola"]
-[ext_resource type="PackedScene" path="res://assets/armas/bate.fbx" id="4_bate"]
-[ext_resource type="PackedScene" path="res://assets/armas/escopeta.fbx" id="5_escopeta"]
-[ext_resource type="PackedScene" path="res://assets/armas/hacha.fbx" id="6_hacha"]
+[ext_resource type="PackedScene" path="res://assets/armas/pistola.glb" id="3_pistola"]
+[ext_resource type="PackedScene" path="res://assets/armas/bate con clavos.glb" id="4_bate"]
+[ext_resource type="PackedScene" path="res://assets/armas/escopeta.glb" id="5_escopeta"]
+[ext_resource type="PackedScene" path="res://assets/armas/hacha.glb" id="6_hacha"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4

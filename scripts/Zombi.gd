@@ -32,6 +32,7 @@ var anim_carrera: String = ""
 @onready var sincronizador: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @onready var detector_barricada: RayCast3D = $RayCastBarricada
 @onready var visuales: Node3D = $VisualesZombi
+@onready var audio_rugido: AudioStreamPlayer3D = get_node_or_null("AudioRugido")
 
 func _ready() -> void:
 	salud_actual = salud_maxima
@@ -179,6 +180,8 @@ func buscar_jugador_cercano() -> void:
 func atacar_jugador() -> void:
 	puede_atacar = false
 	timer_ataque.start()
+	if audio_rugido and not audio_rugido.playing:
+		audio_rugido.play()
 	if objetivo_actual and objetivo_actual.has_method("recibir_danio"):
 		objetivo_actual.recibir_danio(danio_ataque)
 

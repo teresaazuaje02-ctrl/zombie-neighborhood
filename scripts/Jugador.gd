@@ -56,10 +56,18 @@ var cadencia_disparo: float = 0.25
 @onready var socket_arma: Node3D = $Cabeza/Camera3D/SocketArma
 @onready var malla_pistola: Node3D = $Cabeza/Camera3D/SocketArma/Pistola9mm
 @onready var malla_bate: Node3D = $Cabeza/Camera3D/SocketArma/BateClavos
+@onready var malla_hacha: Node3D = $Cabeza/Camera3D/SocketArma/Hacha
 @onready var malla_escopeta: Node3D = $Cabeza/Camera3D/SocketArma/Escopeta
 @onready var malla_rifle: Node3D = $Cabeza/Camera3D/SocketArma/Rifle
 @onready var malla_subfusil: Node3D = $Cabeza/Camera3D/SocketArma/Subfusil
 @onready var fogonazo: OmniLight3D = $Cabeza/Camera3D/SocketArma/Fogonazo
+
+# Reproductores de Efectos de Sonido Retro
+@onready var audio_disparo: AudioStreamPlayer3D = $Audios/AudioDisparo
+@onready var audio_impacto: AudioStreamPlayer3D = $Audios/AudioImpacto
+@onready var audio_swing: AudioStreamPlayer3D = $Audios/AudioSwing
+@onready var audio_recarga: AudioStreamPlayer = $Audios/AudioRecarga
+@onready var audio_botin: AudioStreamPlayer = $Audios/AudioBotin
 
 var tipo_arma_equipada: String = "pistola"
 
@@ -104,6 +112,7 @@ func _ready() -> void:
 func actualizar_modelo_arma_visible() -> void:
 	if malla_pistola: malla_pistola.visible = (tipo_arma_equipada == "pistola")
 	if malla_bate: malla_bate.visible = (tipo_arma_equipada == "bate")
+	if malla_hacha: malla_hacha.visible = (tipo_arma_equipada == "hacha")
 	if malla_escopeta: malla_escopeta.visible = (tipo_arma_equipada == "escopeta")
 	if malla_rifle: malla_rifle.visible = (tipo_arma_equipada == "rifle")
 	if malla_subfusil: malla_subfusil.visible = (tipo_arma_equipada == "subfusil")
@@ -112,6 +121,9 @@ func actualizar_modelo_arma_visible() -> void:
 		match tipo_arma_equipada:
 			"bate":
 				hud.actualizar_arma_nombre("Bate con Clavos" if not mejoras_desbloqueadas.get("bate_electrico", false) else "Bate Eléctrico MK-II")
+				hud.actualizar_municion(-1, -1)
+			"hacha":
+				hud.actualizar_arma_nombre("Hacha de Bombero")
 				hud.actualizar_municion(-1, -1)
 			"pistola":
 				hud.actualizar_arma_nombre("Pistola 9mm" if not mejoras_desbloqueadas.get("pistola_doble", false) else "Pistola Doble Acción MK-II")
@@ -174,6 +186,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			actualizar_modelo_arma_visible()
 		elif event.keycode == KEY_3:
 			tipo_arma_equipada = "escopeta"
+			actualizar_modelo_arma_visible()
+		elif event.keycode == KEY_4:
+			tipo_arma_equipada = "hacha"
 			actualizar_modelo_arma_visible()
 
 	if event.is_action_pressed("ui_cancel"):
@@ -250,9 +265,16 @@ func actualizar_prompt_interaccion() -> void:
 	hud.mostrar_prompt_interaccion("", false)
 
 func ejecutar_disparo() -> void:
-	if tipo_arma_equipada == "bate":
+	if tipo_arma_equipada in ["bate", "hacha"]:
 		puede_disparar = false
-		animar_golpe_bate()
+		if audio_swing:
+			audio_swing.play()
+
+		if tipo_arma_equipada == "bate":
+			animar_golpe_bate()
+		else:
+			animar_golpe_hacha()
+
 		if raycast_disparo.is_colliding():
 			var col_point = raycast_disparo.get_collision_point()
 			var dist = cabeza.global_position.distance_to(col_point)
@@ -260,11 +282,13 @@ func ejecutar_disparo() -> void:
 			if dist <= 2.6:
 				var objetivo = raycast_disparo.get_collider()
 				if objetivo and objetivo.is_in_group("enemigos"):
-					var danio_a_aplicar = 65.0
-					if mejoras_desbloqueadas.get("bate_electrico", false):
+					if audio_impacto:
+						audio_impacto.play()
+					var danio_a_aplicar = 65.0 if tipo_arma_equipada == "bate" else 85.0
+					if tipo_arma_equipada == "bate" and mejoras_desbloqueadas.get("bate_electrico", false):
 						danio_a_aplicar = 100.0
 					rpc_id(1, "servidor_aplicar_danio_a_enemigo", objetivo.get_path(), danio_a_aplicar)
-		await get_tree().create_timer(0.4).timeout
+		await get_tree().create_timer(0.38 if tipo_arma_equipada == "bate" else 0.52).timeout
 		puede_disparar = true
 		return
 
@@ -276,6 +300,8 @@ func ejecutar_disparo() -> void:
 	hud.actualizar_municion(cargador_actual, municion_reserva)
 	retroceso_actual = Vector3(0.0, 0.03, 0.08)
 	activar_fogonazo()
+	if audio_disparo:
+		audio_disparo.play()
 
 	puede_disparar = false
 
@@ -299,16 +325,30 @@ func animar_golpe_bate() -> void:
 	tween_back.tween_property(malla_bate, "rotation", rot_orig, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween_back.tween_property(malla_bate, "position", pos_orig, 0.22)
 
+func animar_golpe_hacha() -> void:
+	if not malla_hacha: return
+	var rot_orig = malla_hacha.rotation
+	var pos_orig = malla_hacha.position
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(malla_hacha, "rotation", rot_orig + Vector3(deg_to_rad(-45), deg_to_rad(-25), deg_to_rad(30)), 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tween.tween_property(malla_hacha, "position", pos_orig + Vector3(-0.08, -0.08, -0.16), 0.14)
+	await tween.finished
+	var tween_back = create_tween().set_parallel(true)
+	tween_back.tween_property(malla_hacha, "rotation", rot_orig, 0.26).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween_back.tween_property(malla_hacha, "position", pos_orig, 0.26)
+
 func activar_fogonazo() -> void:
 	fogonazo.visible = true
 	await get_tree().create_timer(0.05).timeout
 	fogonazo.visible = false
 
 func ejecutar_recarga() -> void:
-	if tipo_arma_equipada == "bate" or cargador_actual == cargador_maximo or municion_reserva <= 0 or recargando:
+	if tipo_arma_equipada in ["bate", "hacha"] or cargador_actual == cargador_maximo or municion_reserva <= 0 or recargando:
 		return
 
 	recargando = true
+	if audio_recarga:
+		audio_recarga.play()
 	var tiempo = tiempo_recarga_base * multiplicador_recarga
 	retroceso_actual = Vector3(0.0, -0.2, 0.05)
 	await get_tree().create_timer(tiempo).timeout
@@ -343,6 +383,8 @@ func recibir_botin(botin: Dictionary) -> void:
 		botiquines_auto_reanimar += 1
 
 	actualizar_hud_suministros()
+	if is_multiplayer_authority() and audio_botin:
+		audio_botin.play()
 	
 	var texto_botin = "+$%d Suministros | +%d Balas" % [botin.get("suministros", 0), botin.get("municion", 0)]
 	if botin.get("botiquin", false):
@@ -362,7 +404,11 @@ func agregar_suministros(cantidad: int) -> void:
 		total = int(total * 1.35)
 	suministros += total
 	actualizar_hud_suministros()
+	if is_multiplayer_authority() and audio_botin:
+		audio_botin.play()
 	if is_multiplayer_authority():
+		if audio_botin:
+			audio_botin.play()
 		hud.mostrar_regla(1, "Baja de Infectado", "+$%d Suministros" % total)
 
 # Sistema de Comercio
@@ -388,6 +434,8 @@ func _al_procesar_compra(articulo: String) -> void:
 
 	if exito:
 		actualizar_hud_suministros()
+	if is_multiplayer_authority() and audio_botin:
+		audio_botin.play()
 		hud.mostrar_regla(2, "Doble Tiro", "¡Nueva arma / suministro adquirido en la tienda!")
 
 func equipar_arma_comprada(nombre: String, danio: float, cargador: int, reserva: int) -> void:
@@ -433,6 +481,8 @@ func _al_procesar_mejora(tipo_mejora: String) -> void:
 	if exito:
 		mejoras_desbloqueadas[tipo_mejora] = true
 		actualizar_hud_suministros()
+	if is_multiplayer_authority() and audio_botin:
+		audio_botin.play()
 		hud.mostrar_regla(2, "Doble Tiro", "¡Mejora experimental MK-II ensamblada con éxito!")
 
 func aplicar_mejora_mk2(tipo_mejora: String) -> void:

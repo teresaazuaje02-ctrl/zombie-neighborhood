@@ -201,6 +201,11 @@ func recibir_danio(cantidad: float) -> void:
 		morir()
 
 func morir() -> void:
+	# Notificar al gestor de oleadas para el avance de rondas
+	var oleada_mgr = get_tree().root.find_child("OleadaManager", true, false)
+	if oleada_mgr and oleada_mgr.has_method("registrar_baja_zombi"):
+		oleada_mgr.registrar_baja_zombi()
+
 	# Notificar a la tienda del tendero si fue eliminado en su perímetro de defensa
 	var tiendas = get_tree().get_nodes_in_group("tienda_npc")
 	for t in tiendas:

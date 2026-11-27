@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://b7v12kj9pq8mn"]
+[gd_scene format=3 uid="uid://b7v12kkapq8mn"]
 
 [ext_resource type="Script" path="res://scripts/PuestoMejoras.gd" id="1_mejoras"]
 

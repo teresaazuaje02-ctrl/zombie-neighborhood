@@ -29,6 +29,15 @@ signal mejora_solicitada(tipo_mejora: String)
 @onready var panel_mejoras: PanelContainer = $MenuMejoras
 @onready var label_fondos_mejoras: Label = $MenuMejoras/VBox/FondosLabel
 
+# Indicadores de Ronda y Oleada
+@onready var label_ronda: Label = $Margen/SuperiorIzquierda/VBox/LabelRonda
+@onready var label_zombis_restantes: Label = $Margen/SuperiorIzquierda/VBox/LabelZombisRestantes
+@onready var label_tregua: Label = $Margen/SuperiorIzquierda/VBox/LabelTregua
+@onready var banner_gran_ronda: PanelContainer = $CentroAlerta/BannerGranRonda
+@onready var titulo_gran_ronda: Label = $CentroAlerta/BannerGranRonda/VBox/Titulo
+@onready var subtitulo_gran_ronda: Label = $CentroAlerta/BannerGranRonda/VBox/Subtitulo
+@onready var timer_gran_ronda: Timer = $CentroAlerta/BannerGranRonda/TimerGranRonda
+
 var tienda_actual: Node = null
 var puesto_mejoras_actual: Node = null
 
@@ -38,7 +47,13 @@ func _ready() -> void:
 	banner_regla.visible = false
 	if panel_tienda:
 		panel_tienda.visible = false
+	if panel_mejoras:
+		panel_mejoras.visible = false
+	if banner_gran_ronda:
+		banner_gran_ronda.visible = false
 	timer_regla.timeout.connect(_ocultar_banner_regla)
+	if timer_gran_ronda:
+		timer_gran_ronda.timeout.connect(_ocultar_banner_gran_ronda)
 
 func actualizar_salud(actual: float, maxima: float) -> void:
 	barra_vida.max_value = maxima
@@ -141,3 +156,44 @@ func _on_mejorar_barricada_pressed() -> void:
 
 func _on_cerrar_mejoras_pressed() -> void:
 	cerrar_puesto_mejoras()
+
+# Funciones de Rondas y Oleadas
+func mostrar_banner_ronda(num_ronda: int) -> void:
+	if banner_gran_ronda and titulo_gran_ronda:
+		titulo_gran_ronda.text = "★ RONDA %d ★" % num_ronda
+		subtitulo_gran_ronda.text = "SOBREVIVE AL ATAQUE"
+		banner_gran_ronda.visible = true
+		if label_tregua:
+			label_tregua.visible = false
+		if timer_gran_ronda:
+			timer_gran_ronda.start(3.5)
+
+func mostrar_fin_ronda(num_ronda: int, bonif: int) -> void:
+	if banner_gran_ronda and titulo_gran_ronda:
+		titulo_gran_ronda.text = "★ RONDA %d SUPERADA ★" % num_ronda
+		subtitulo_gran_ronda.text = "+$%d Suministros por sobrevivir" % bonif
+		banner_gran_ronda.visible = true
+		if timer_gran_ronda:
+			timer_gran_ronda.start(3.5)
+
+func _ocultar_banner_gran_ronda() -> void:
+	if banner_gran_ronda:
+		banner_gran_ronda.visible = false
+
+func actualizar_contador_ronda(num_ronda: int, total_zombis: int) -> void:
+	if label_ronda:
+		label_ronda.text = "RONDA %d" % num_ronda
+	if label_zombis_restantes:
+		label_zombis_restantes.text = "INFECTADOS RESTANTES: %d" % total_zombis
+
+func actualizar_contador_zombis_restantes(total: int) -> void:
+	if label_zombis_restantes:
+		label_zombis_restantes.text = "INFECTADOS RESTANTES: %d" % total
+
+func actualizar_tiempo_tregua(segundos: int) -> void:
+	if label_tregua:
+		if segundos > 0:
+			label_tregua.visible = true
+			label_tregua.text = "TREGUA: %ds (Repara y compra)" % segundos
+		else:
+			label_tregua.visible = false

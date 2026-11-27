@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://df6y58px4k91v" path="res://escenas/mapa/Barrio.tscn" id="2_barrio"]
 [ext_resource type="PackedScene" uid="uid://c3q8f921pxvme" path="res://escenas/interactuables/Barricada.tscn" id="3_barricada"]
 [ext_resource type="PackedScene" uid="uid://ba4e21p7qx8ym" path="res://escenas/interactuables/ContenedorLoot.tscn" id="4_loot"]
+[ext_resource type="Script" path="res://scripts/OleadaManager.gd" id="5_oleadas"]
 
 [node name="Mundo" type="Node3D"]
 script = ExtResource("1_mundo")
@@ -33,6 +34,9 @@ spawn_path = NodePath("../ContenedorZombis")
 
 [node name="TimerOleadas" type="Timer" parent="."]
 wait_time = 4.0
+
+[node name="OleadaManager" type="Node" parent="." groups=["gestor_oleadas"]]
+script = ExtResource("5_oleadas")
 
 [node name="MenuLobby" type="CanvasLayer" parent="."]
 

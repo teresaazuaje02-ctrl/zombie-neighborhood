@@ -110,6 +110,37 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
+[node name="SuperiorIzquierda" type="Control" parent="Margen"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margen/SuperiorIzquierda"]
+layout_mode = 1
+offset_right = 280.0
+offset_bottom = 80.0
+theme_override_constants/separation = 4
+
+[node name="LabelRonda" type="Label" parent="Margen/SuperiorIzquierda/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.22, 0.22, 1)
+theme_override_font_sizes/font_size = 28
+text = "RONDA 1"
+
+[node name="LabelZombisRestantes" type="Label" parent="Margen/SuperiorIzquierda/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "INFECTADOS RESTANTES: 6"
+
+[node name="LabelTregua" type="Label" parent="Margen/SuperiorIzquierda/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "TREGUA: 20s (Repara y compra)"
+
 [node name="InferiorIzquierda" type="Control" parent="Margen"]
 layout_mode = 2
 size_flags_horizontal = 0
@@ -238,6 +269,42 @@ theme_override_font_sizes/font_size = 18
 text = "¡ESTÁS DERRIBADO!
 Pulsa [ESPACIO] o espera auxilio médico"
 horizontal_alignment = 1
+
+[node name="BannerGranRonda" type="PanelContainer" parent="CentroAlerta"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -65.0
+offset_right = 220.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
+
+[node name="VBox" type="VBoxContainer" parent="CentroAlerta/BannerGranRonda"]
+layout_mode = 2
+alignment = 1
+
+[node name="Titulo" type="Label" parent="CentroAlerta/BannerGranRonda/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 32
+text = "★ RONDA 1 ★"
+horizontal_alignment = 1
+
+[node name="Subtitulo" type="Label" parent="CentroAlerta/BannerGranRonda/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "SOBREVIVE AL ATAQUE"
+horizontal_alignment = 1
+
+[node name="TimerGranRonda" type="Timer" parent="CentroAlerta/BannerGranRonda"]
+one_shot = true
 
 [node name="SuperiorCentro" type="Control" parent="."]
 layout_mode = 3

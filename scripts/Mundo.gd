@@ -9,6 +9,7 @@ extends Node3D
 @onready var rol_selector: OptionButton = $MenuLobby/Panel/VBoxContainer/RolSelector
 @onready var timer_oleadas: Timer = $TimerOleadas
 @onready var barrio: Node3D = $Barrio
+@onready var oleada_manager: Node = $OleadaManager
 
 const ESCENA_JUGADOR = preload("res://escenas/jugadores/Jugador.tscn")
 const ESCENA_ZOMBI = preload("res://escenas/enemigos/Zombi.tscn")
@@ -24,7 +25,7 @@ func _ready() -> void:
 	RedManager.jugador_conectado.connect(_al_jugador_conectado)
 	RedManager.jugador_desconectado.connect(_al_jugador_desconectado)
 
-	timer_oleadas.timeout.connect(_generar_oleada_barrio)
+	oleada_manager.inicializar(contenedor_zombis, barrio)
 
 func _on_host_pressed() -> void:
 	RedManager.mi_info["rol"] = rol_selector.get_selected_id()
@@ -32,7 +33,7 @@ func _on_host_pressed() -> void:
 	if error == OK:
 		menu_lobby.visible = false
 		_instanciar_jugador(1)
-		timer_oleadas.start(3.5)
+		oleada_manager.iniciar_partida()
 
 func _on_unirse_pressed() -> void:
 	RedManager.mi_info["rol"] = rol_selector.get_selected_id()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://c8n1pk4q8mv3e"]
+[gd_scene format=3 uid="uid://c8n1pk4q8mv3e"]
 
 [ext_resource type="Script" path="res://scripts/TiendaNPC.gd" id="1_tienda"]
 
